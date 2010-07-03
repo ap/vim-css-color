@@ -1,4 +1,4 @@
-css\_color Vim plugin
+vim-css-color plugin
 ====================
 
 [css\_color.vim](http://www.vim.org/scripts/script.php?script_id=2150) plugin by Niklas Hofer is great, but lacks two important features:
