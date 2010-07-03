@@ -8,7 +8,7 @@ css\_color Vim plugin
 
 So here is my patch.
 
-!(Screen shot)[http://github.com/skammer/css_color/raw/master/Screen%20shot%202010-07-04%20at%200.19.46.png]
+![Screen shot](http://github.com/skammer/css_color/raw/master/Screen%20shot%202010-07-04%20at%200.19.46.png)
 
 [My inpiration](http://julien.danjou.info/rainbow-mode.html) and [ConvertBase.vim](http://www.vim.org/scripts/script.php?script_id=54) plugin I used for base conversion.
 
