@@ -10,6 +10,6 @@ So here is my patch.
 
 ![Screen shot](http://github.com/skammer/vim-css-color/raw/master/Screen%20shot%202010-07-04%20at%200.19.46.png)
 
-[My inpiration](http://julien.danjou.info/rainbow-mode.html) and [ConvertBase.vim](http://www.vim.org/scripts/script.php?script_id=54) plugin I used for base conversion.
+Major kudos to [rainbow-mode.el](http://julien.danjou.info/rainbow-mode.html), from which I borrowed some code, and to [ConvertBase.vim](http://www.vim.org/scripts/script.php?script_id=54) plugin I used for base conversion.
 
 I highly recomend using [pathogen.vim](http://www.vim.org/scripts/script.php?script_id=2332) plugin for all your plugin installations. It's so good, it should be illegal. God bless Tim Pope.
