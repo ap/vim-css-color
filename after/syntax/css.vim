@@ -1,6 +1,5 @@
 " Language:     Colored CSS Color Preview
-" Author:       Niklas Hofer <niklas+vim@lanpartei.de>
-" Maintainer:   Max Vasiliev <vim@skammer.name>
+" Author:       Max Vasiliev <vim@skammer.name>
 " Last Change:  2010 Jul 3
 " Licence:      No Warranties. WTFPL. But please tell me!
 " Version:      0.7
