@@ -390,4 +390,8 @@ if has("gui_running") || &t_Co==256
 
   autocmd CursorHold * silent call s:PreviewCSSColorInLine('.')
   autocmd CursorHoldI * silent call s:PreviewCSSColorInLine('.')
-endif   " has("gui_running")
+  if !exists('g:cssColorVimDoNotMessMyUpdatetime')
+    set ut=100
+  endif
+
+endif
