@@ -8,7 +8,7 @@ vim-css-color plugin
 
 So here is my patch.
 
-![Screen shot](http://github.com/skammer/vim-css-color/raw/master/Screen%20shot%202010-07-04%20at%200.19.46.png)
+![Screen shot](https://github.com/skammer/vim-css-color/raw/master/Screen%20shot%202010-07-04%20at%200.19.46.png)
 
 Configuration
 -------------
