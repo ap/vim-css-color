@@ -125,34 +125,31 @@ function! s:PreviewCSSColorInLine()
   " TODO use cssColor matchdata
   let n = 0
   while 1
-    let foundcolor = matchstr( getline('.'), '#\x\{3}\(\x\{3}\)\?\>', 0, n )
-    if len( foundcolor ) == 0 | break | endif
-
-    if len( foundcolor ) == 4
-      let color = substitute(foundcolor, '\(\x\)\(\x\)\(\x\)', '\1\1\2\2\3\3', '')
-    else
-      let color = foundcolor
-    endif
-
-    call s:SetMatcher(color,foundcolor)
-
+    let rgb = matchlist( getline('.'), '#\(\x\)\(\x\)\(\x\)\>', 0, n )
+    if len( rgb ) == 0 | break | endif
+    let [r,g,b] = rgb[1:3]
+    call s:SetMatcher( '#'.r.r.g.g.b.b, rgb[0] )
     let n+=1
   endwhile
+  unlet rgb
 
   let n = 0
   while 1
-      let foundcolorlist = matchlist( getline('.'), 'rgb[a]\=(\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\).\{-})', 0, n )
-      if len( foundcolorlist ) == 0 | break | endif
+    let rgb = matchstr( getline('.'), '#\x\{6}\>', 0, n )
+    if len( rgb ) == 0 | break | endif
+    call s:SetMatcher( rgb, rgb )
+    let n+=1
+  endwhile
+  unlet rgb
 
-      let foundcolorlist[1] = s:value2hex( foundcolorlist[1] )
-      let foundcolorlist[2] = s:value2hex( foundcolorlist[2] )
-      let foundcolorlist[3] = s:value2hex( foundcolorlist[3] )
-
-      let color = "#".join( foundcolorlist[1:3], "" )
-
-      call s:SetMatcher( color, foundcolorlist[0] )
-
-      let n+=1
+  let n = 0
+  while 1
+    let rgb = matchlist( getline('.'), 'rgba\?(\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', 0, n )
+    if len( rgb ) == 0 | break | endif
+    let [r,g,b] = rgb[1:3]
+    let color = '#'.s:value2hex(r).s:value2hex(g).s:value2hex(b)
+    call s:SetMatcher( color, rgb[0] )
+    let n+=1
   endwhile
 endfunction
 
