@@ -4,21 +4,17 @@
 " Licence:      No Warranties. WTFPL. But please tell me!
 " Version:      0.7.1
 
-function! s:hex(hex)
-  return eval('0x'.a:hex)
-endfunction
+let s:hex={}
+for i in range(0, 255)
+  let s:hex[ printf( '%02x', i ) ] = i
+endfor
 
 function! s:FGforBG(bg)
   " takes a 6hex color code and returns a matching color that is visible
-  let val = matchlist(a:bg,'^#\(\x\x\)\(\x\x\)\(\x\x\)$')
-  let r = s:hex(val[1])
-  let g = s:hex(val[2])
-  let b = s:hex(val[3])
-  if r*30 + g*59 + b*11 > 12000
-    return '#000000'
-  else
-    return '#ffffff'
-  end
+  let rgb = matchlist(tolower(a:bg),'^#\(\x\x\)\(\x\x\)\(\x\x\)$')
+  if len( rgb ) == 0 | return '#cccccc' | endif
+  let [r,g,b] = rgb[1:3]
+  return s:hex[r]*30 + s:hex[g]*59 + s:hex[b]*11 > 12000 ? '#000000' : '#ffffff'
 endfunction
 
 function! s:SetMatcher(clr,pat)
@@ -94,9 +90,10 @@ endfor
 function! s:Rgb2xterm(color)
   let best_match=0
   let smallest_distance = 10000000000
-  let r = s:hex(a:color[1].a:color[2])
-  let g = s:hex(a:color[3].a:color[4])
-  let b = s:hex(a:color[5].a:color[6])
+  let color = tolower(a:color)
+  let r = s:hex[color[1:2]]
+  let g = s:hex[color[3:4]]
+  let b = s:hex[color[5:6]]
   for c in range(0,254)
     let d = s:pow(s:colortable[c][0]-r,2) + s:pow(s:colortable[c][1]-g,2) + s:pow(s:colortable[c][2]-b,2)
     if d<smallest_distance
