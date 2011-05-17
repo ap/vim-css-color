@@ -18,7 +18,7 @@ function! s:FGforBG(bg)
 endfunction
 
 function! s:SetMatcher(clr,pat)
-  let group = 'cssColor'.substitute(a:clr,'^#','','')
+  let group = 'cssColor'.matchstr(a:clr,'^#\zs.*')
   redir => s:currentmatch
   silent! exe 'syn list' group
   redir END
@@ -102,7 +102,7 @@ function! s:Rgb2xterm(color)
 endfunction
 
 function! s:SetNamedColor(clr,name)
-  let group = 'cssColor'.substitute(a:clr,'^#','','')
+  let group = 'cssColor'.matchstr(a:clr,'^#\zs.*')
   exe 'syn keyword' group a:name 'contained'
   exe 'syn cluster cssColors add='.group
   if has('gui_running')
