@@ -38,50 +38,44 @@ function! s:SetMatcher(clr,pat)
   endif
 endfunction
 
-" the 6 value iterations in the xterm color cube
-let s:valuerange = [ 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF ]
+" xterm color table
+" 16 vt100 colors preset
+let s:colortable=[
+\  [ 0x00, 0x00, 0x00 ],
+\  [ 0xCD, 0x00, 0x00 ],
+\  [ 0x00, 0xCD, 0x00 ],
+\  [ 0xCD, 0xCD, 0x00 ],
+\  [ 0x00, 0x00, 0xEE ],
+\  [ 0xCD, 0x00, 0xCD ],
+\  [ 0x00, 0xCD, 0xCD ],
+\  [ 0xE5, 0xE5, 0xE5 ],
+\  [ 0x7F, 0x7F, 0x7F ],
+\  [ 0xFF, 0x00, 0x00 ],
+\  [ 0x00, 0xFF, 0x00 ],
+\  [ 0xFF, 0xFF, 0x00 ],
+\  [ 0x5C, 0x5C, 0xFF ],
+\  [ 0xFF, 0x00, 0xFF ],
+\  [ 0x00, 0xFF, 0xFF ],
+\  [ 0xFF, 0xFF, 0xFF ]]
 
-" 16 basic colors
-let s:basic16 = [ [ 0x00, 0x00, 0x00 ], [ 0xCD, 0x00, 0x00 ], [ 0x00, 0xCD, 0x00 ], [ 0xCD, 0xCD, 0x00 ], [ 0x00, 0x00, 0xEE ], [ 0xCD, 0x00, 0xCD ], [ 0x00, 0xCD, 0xCD ], [ 0xE5, 0xE5, 0xE5 ], [ 0x7F, 0x7F, 0x7F ], [ 0xFF, 0x00, 0x00 ], [ 0x00, 0xFF, 0x00 ], [ 0xFF, 0xFF, 0x00 ], [ 0x5C, 0x5C, 0xFF ], [ 0xFF, 0x00, 0xFF ], [ 0x00, 0xFF, 0xFF ], [ 0xFF, 0xFF, 0xFF ] ]
+" xterm color cube
+let valuerange = [ 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF ] " the 6 values used
+for c in range(0, 215)
+  let r = valuerange[ ( c / 36 ) % 6 ]
+  let g = valuerange[ ( c /  6 ) % 6 ]
+  let b = valuerange[   c        % 6 ]
+  let s:colortable += [[r,g,b]]
+endfor
 
-function! s:Xterm2rgb(color)
-  " 16 basic colors
-  let r=0
-  let g=0
-  let b=0
-  if a:color<16
-    let r = s:basic16[a:color][0]
-    let g = s:basic16[a:color][1]
-    let b = s:basic16[a:color][2]
-  endif
-
-  " color cube color
-  if a:color>=16 && a:color<=232
-    let color=a:color-16
-    let r = s:valuerange[(color/36)%6]
-    let g = s:valuerange[(color/6)%6]
-    let b = s:valuerange[color%6]
-  endif
-
-  " gray tone
-  if a:color>=233 && a:color<=253
-    let r=8+(a:color-232)*0x0a
-    let g=r
-    let b=r
-  endif
-  let rgb=[r,g,b]
-  return rgb
-endfunction
+" grayscale ramp
+for c in range(0, 23)
+  let value = 8 + c * 0x0a
+  let s:colortable += [[value, value, value]]
+endfor
 
 function! s:square(x)
   return a:x * a:x
 endfunction
-
-let s:colortable=[]
-for c in range(0, 254)
-  let color = s:Xterm2rgb(c)
-  call add(s:colortable, color)
-endfor
 
 " selects the nearest xterm color for a rgb value like #FF0000
 function! s:Rgb2xterm(color)
@@ -91,7 +85,7 @@ function! s:Rgb2xterm(color)
   let r = s:hex[color[1:2]]
   let g = s:hex[color[3:4]]
   let b = s:hex[color[5:6]]
-  for c in range(0,254)
+  for c in range(0,255)
     let d = s:square(s:colortable[c][0]-r) + s:square(s:colortable[c][1]-g) + s:square(s:colortable[c][2]-b)
     if d<smallest_distance
       let smallest_distance = d
