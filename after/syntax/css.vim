@@ -4,10 +4,6 @@
 " Licence:      No Warranties. WTFPL. But please tell me!
 " Version:      0.7.1
 
-function! s:StrLen(str)
-  return strlen(substitute(a:str, '.', 'x', 'g'))
-endfunction
-
 function! s:FGforBG(bg)
   " takes a 6hex color code and returns a matching color that is visible
   let pure = substitute(a:bg,'^#','','')
@@ -120,60 +116,11 @@ function! s:SetNamedColor(clr,name)
   endif
 endfunction
 
-" shamelessly stolen from ConvertBase.vim
-" http://www.vim.org/scripts/script.php?script_id=54
-function! s:ConvertToBase(int, base)
-  if (a:base < 2 || a:base > 36)
-    echohl ErrorMsg
-    echo "Bad base - must be between 2 and 36."
-    echohl None
-    return ''
-  endif
-
-  if (a:int == 0)
-    return 0
-  endif
-
-  let out=''
-
-  let isnegative = 0
-  let int=a:int
-  if (int < 0)
-    let isnegative = 1
-    let int = - int
-  endif
-
-  while (int != 0)
-    let out = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[(int % a:base)] . out
-    let int = int / a:base
-  endwhile
-
-  if isnegative
-    let out = '-' . out
-  endif
-
-  return out
-endfunction
-
 " Convert 80% -> 204, 100% -> 255, etc.
-" This piece of code was ported from lisp.
-" http://julien.danjou.info/rainbow-mode.html
-fun! s:RGBRelativeToAbsolute(value)
-  let string_length = s:StrLen(a:value)-1
-  if strpart(a:value, string_length, 1) == '%'
-    let hex_value = s:ConvertToBase(  255*strpart(a:value, 0, string_length)/100, 16 )
-    if len(hex_value) == 1
-      return "0".hex_value
-    endif
-    return hex_value
-  else
-    let hex_value = s:ConvertToBase( a:value, 16 )
-    if len( hex_value ) == 1
-      return "0".hex_value
-    else
-      return hex_value
-    endif
-  endif
+fun! s:value2hex(value)
+  let percentage = matchstr( a:value, '\(.*\)\ze%$' )
+  let value = len( percentage ) ? ( 255 * percentage ) / 100 : a:value
+  return printf( '%02x', value )
 endf
 
 function! s:PreviewCSSColorInLine()
@@ -201,9 +148,9 @@ function! s:PreviewCSSColorInLine()
   let n = 1
   let foundcolorlist = matchlist( getline('.'), 'rgb[a]\=(\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\).\{-})', 0, n )
   while len(foundcolorlist) != 0
-      let foundcolorlist[1] = s:RGBRelativeToAbsolute( foundcolorlist[1] )
-      let foundcolorlist[2] = s:RGBRelativeToAbsolute( foundcolorlist[2] )
-      let foundcolorlist[3] = s:RGBRelativeToAbsolute( foundcolorlist[3] )
+      let foundcolorlist[1] = s:value2hex( foundcolorlist[1] )
+      let foundcolorlist[2] = s:value2hex( foundcolorlist[2] )
+      let foundcolorlist[3] = s:value2hex( foundcolorlist[3] )
 
       let color = "#".join( foundcolorlist[1:3], "" )
 
