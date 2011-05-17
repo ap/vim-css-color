@@ -176,10 +176,10 @@ fun! s:RGBRelativeToAbsolute(value)
   endif
 endf
 
-function! s:PreviewCSSColorInLine(where)
+function! s:PreviewCSSColorInLine()
   " TODO use cssColor matchdata
   let n = 1
-  let foundcolor = matchstr( getline(a:where), '#[0-9A-Fa-f]\{3,6\}\>' )
+  let foundcolor = matchstr( getline('.'), '#[0-9A-Fa-f]\{3,6\}\>' )
   while foundcolor != ''
     if foundcolor =~ '#\x\{6}$'
       let color = foundcolor
@@ -194,12 +194,12 @@ function! s:PreviewCSSColorInLine(where)
     endif
 
     let n+=1
-    let foundcolor = matchstr( getline(a:where), '#[0-9A-Fa-f]\{3,6}', 0, n )
+    let foundcolor = matchstr( getline('.'), '#[0-9A-Fa-f]\{3,6}', 0, n )
   endwhile
 
 
   let n = 1
-  let foundcolorlist = matchlist( getline(a:where), 'rgb[a]\=(\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\).\{-})', 0, n )
+  let foundcolorlist = matchlist( getline('.'), 'rgb[a]\=(\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\).\{-})', 0, n )
   while len(foundcolorlist) != 0
       let foundcolorlist[1] = s:RGBRelativeToAbsolute( foundcolorlist[1] )
       let foundcolorlist[2] = s:RGBRelativeToAbsolute( foundcolorlist[2] )
@@ -210,7 +210,7 @@ function! s:PreviewCSSColorInLine(where)
       call s:SetMatcher( color, foundcolorlist[0] )
 
       let n+=1
-      let foundcolorlist = matchlist( getline(a:where), 'rgb[a]\=(\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\).\{-})', 0, n )
+      let foundcolorlist = matchlist( getline('.'), 'rgb[a]\=(\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\).\{-})', 0, n )
   endw
 endfunction
 
@@ -377,17 +377,12 @@ if has("gui_running") || &t_Co==256
   call s:SetNamedColor('#F5F5F5','WhiteSmoke')
   call s:SetNamedColor('#9ACD32','YellowGreen')
 
+  let view = winsaveview()
+  %call s:PreviewCSSColorInLine()
+  call winrestview(view)
 
-
-  let i = 1
-  while i <= line("$")
-    call s:PreviewCSSColorInLine(i)
-    let i = i+1
-  endwhile
-  unlet i
-
-  autocmd CursorHold * silent call s:PreviewCSSColorInLine('.')
-  autocmd CursorHoldI * silent call s:PreviewCSSColorInLine('.')
+  autocmd CursorHold * silent call s:PreviewCSSColorInLine()
+  autocmd CursorHoldI * silent call s:PreviewCSSColorInLine()
   if !exists('g:cssColorVimDoNotMessMyUpdatetime')
     set ut=100
   endif
