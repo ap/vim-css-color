@@ -10,10 +10,10 @@ endfunction
 
 function! s:FGforBG(bg)
   " takes a 6hex color code and returns a matching color that is visible
-  let pure = substitute(a:bg,'^#','','')
-  let r = s:hex(pure[0].pure[1])
-  let g = s:hex(pure[2].pure[3])
-  let b = s:hex(pure[4].pure[5])
+  let val = matchlist(a:bg,'^#\(\x\x\)\(\x\x\)\(\x\x\)$')
+  let r = s:hex(val[1])
+  let g = s:hex(val[2])
+  let b = s:hex(val[3])
   if r*30 + g*59 + b*11 > 12000
     return '#000000'
   else
