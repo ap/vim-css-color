@@ -4,12 +4,16 @@
 " Licence:      No Warranties. WTFPL. But please tell me!
 " Version:      0.7.1
 
+function! s:hex(hex)
+  return eval('0x'.a:hex)
+endfunction
+
 function! s:FGforBG(bg)
   " takes a 6hex color code and returns a matching color that is visible
   let pure = substitute(a:bg,'^#','','')
-  let r = eval('0x'.pure[0].pure[1])
-  let g = eval('0x'.pure[2].pure[3])
-  let b = eval('0x'.pure[4].pure[5])
+  let r = s:hex(pure[0].pure[1])
+  let g = s:hex(pure[2].pure[3])
+  let b = s:hex(pure[4].pure[5])
   if r*30 + g*59 + b*11 > 12000
     return '#000000'
   else
@@ -90,9 +94,9 @@ endfor
 function! s:Rgb2xterm(color)
   let best_match=0
   let smallest_distance = 10000000000
-  let r = eval('0x'.a:color[1].a:color[2])
-  let g = eval('0x'.a:color[3].a:color[4])
-  let b = eval('0x'.a:color[5].a:color[6])
+  let r = s:hex(a:color[1].a:color[2])
+  let g = s:hex(a:color[3].a:color[4])
+  let b = s:hex(a:color[5].a:color[6])
   for c in range(0,254)
     let d = s:pow(s:colortable[c][0]-r,2) + s:pow(s:colortable[c][1]-g,2) + s:pow(s:colortable[c][2]-b,2)
     if d<smallest_distance
