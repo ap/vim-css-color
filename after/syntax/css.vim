@@ -73,11 +73,8 @@ function! s:Xterm2rgb(color)
   return rgb
 endfunction
 
-function! s:pow(x, n)
-  let x = a:x
-  for i in range(a:n-1)
-    let x = x*a:x
-  return x
+function! s:square(x)
+  return a:x * a:x
 endfunction
 
 let s:colortable=[]
@@ -95,7 +92,7 @@ function! s:Rgb2xterm(color)
   let g = s:hex[color[3:4]]
   let b = s:hex[color[5:6]]
   for c in range(0,254)
-    let d = s:pow(s:colortable[c][0]-r,2) + s:pow(s:colortable[c][1]-g,2) + s:pow(s:colortable[c][2]-b,2)
+    let d = s:square(s:colortable[c][0]-r) + s:square(s:colortable[c][1]-g) + s:square(s:colortable[c][2]-b)
     if d<smallest_distance
       let smallest_distance = d
       let best_match = c
