@@ -129,29 +129,27 @@ endf
 
 function! s:PreviewCSSColorInLine()
   " TODO use cssColor matchdata
-  let n = 1
-  let foundcolor = matchstr( getline('.'), '#[0-9A-Fa-f]\{3,6\}\>' )
-  while foundcolor != ''
-    if foundcolor =~ '#\x\{6}$'
-      let color = foundcolor
-    elseif foundcolor =~ '#\x\{3}$'
+  let n = 0
+  while 1
+    let foundcolor = matchstr( getline('.'), '#\x\{3}\(\x\{3}\)\?\>', 0, n )
+    if len( foundcolor ) == 0 | break | endif
+
+    if len( foundcolor ) == 4
       let color = substitute(foundcolor, '\(\x\)\(\x\)\(\x\)', '\1\1\2\2\3\3', '')
     else
-      let color = ''
+      let color = foundcolor
     endif
 
-    if color != ''
-      call s:SetMatcher(color,foundcolor)
-    endif
+    call s:SetMatcher(color,foundcolor)
 
     let n+=1
-    let foundcolor = matchstr( getline('.'), '#[0-9A-Fa-f]\{3,6}', 0, n )
   endwhile
 
+  let n = 0
+  while 1
+      let foundcolorlist = matchlist( getline('.'), 'rgb[a]\=(\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\).\{-})', 0, n )
+      if len( foundcolorlist ) == 0 | break | endif
 
-  let n = 1
-  let foundcolorlist = matchlist( getline('.'), 'rgb[a]\=(\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\).\{-})', 0, n )
-  while len(foundcolorlist) != 0
       let foundcolorlist[1] = s:value2hex( foundcolorlist[1] )
       let foundcolorlist[2] = s:value2hex( foundcolorlist[2] )
       let foundcolorlist[3] = s:value2hex( foundcolorlist[3] )
@@ -161,8 +159,7 @@ function! s:PreviewCSSColorInLine()
       call s:SetMatcher( color, foundcolorlist[0] )
 
       let n+=1
-      let foundcolorlist = matchlist( getline('.'), 'rgb[a]\=(\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\),\s*\(\d\{1,3}\s*%\=\).\{-})', 0, n )
-  endw
+  endwhile
 endfunction
 
 if has("gui_running") || &t_Co==256
