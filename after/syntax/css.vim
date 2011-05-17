@@ -24,17 +24,17 @@ endfunction
 function! s:SetMatcher(clr,pat)
   let group = 'cssColor'.substitute(a:clr,'^#','','')
   redir => s:currentmatch
-  silent! exe 'syn list '.group
+  silent! exe 'syn list' group
   redir END
   if s:currentmatch !~ a:pat.'\/'
-    exe 'syn match '.group.' /'.a:pat.'/ contained'
+    exe 'syn match' group '/'.a:pat.'/ contained'
     exe 'syn cluster cssColors add='.group
     if has('gui_running')
-      exe 'hi '.group.' guifg='.s:FGforBG(a:clr)
-      exe 'hi '.group.' guibg='.a:clr
+      exe 'hi' group 'guifg='.s:FGforBG(a:clr)
+      exe 'hi' group 'guibg='.a:clr
     elseif &t_Co == 256
-      exe 'hi '.group.' ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
-      exe 'hi '.group.' ctermbg='.s:Rgb2xterm(a:clr)
+      exe 'hi' group 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
+      exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr)
     endif
     return 1
   else
@@ -42,12 +42,12 @@ function! s:SetMatcher(clr,pat)
   endif
 endfunction
 
-"" the 6 value iterations in the xterm color cube
+" the 6 value iterations in the xterm color cube
 let s:valuerange = [ 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF ]
-"
-"" 16 basic colors
+
+" 16 basic colors
 let s:basic16 = [ [ 0x00, 0x00, 0x00 ], [ 0xCD, 0x00, 0x00 ], [ 0x00, 0xCD, 0x00 ], [ 0xCD, 0xCD, 0x00 ], [ 0x00, 0x00, 0xEE ], [ 0xCD, 0x00, 0xCD ], [ 0x00, 0xCD, 0xCD ], [ 0xE5, 0xE5, 0xE5 ], [ 0x7F, 0x7F, 0x7F ], [ 0xFF, 0x00, 0x00 ], [ 0x00, 0xFF, 0x00 ], [ 0xFF, 0xFF, 0x00 ], [ 0x5C, 0x5C, 0xFF ], [ 0xFF, 0x00, 0xFF ], [ 0x00, 0xFF, 0xFF ], [ 0xFF, 0xFF, 0xFF ] ]
-:
+
 function! s:Xterm2rgb(color)
   " 16 basic colors
   let r=0
@@ -109,14 +109,14 @@ endfunction
 
 function! s:SetNamedColor(clr,name)
   let group = 'cssColor'.substitute(a:clr,'^#','','')
-  exe 'syn keyword '.group.' '.a:name.' contained'
+  exe 'syn keyword' group a:name 'contained'
   exe 'syn cluster cssColors add='.group
   if has('gui_running')
-    exe 'hi '.group.' guifg='.s:FGforBG(a:clr)
-    exe 'hi '.group.' guibg='.a:clr
+    exe 'hi' group 'guifg='.s:FGforBG(a:clr)
+    exe 'hi' group 'guibg='.a:clr
   elseif &t_Co == 256
-    exe 'hi '.group.' ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
-    exe 'hi '.group.' ctermbg='.s:Rgb2xterm(a:clr)
+    exe 'hi' group 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
+    exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr)
   endif
 endfunction
 
@@ -173,7 +173,7 @@ if has("gui_running") || &t_Co==256
   if s:olddef != ''
     let s:b = strridx(s:olddef,'matchgroup')
     if s:b != -1
-      exe 'syn region cssDefinition '.strpart(s:olddef,s:b).',@cssColors'
+      exe 'syn region cssDefinition' strpart(s:olddef,s:b).',@cssColors'
     endif
   endif
 
