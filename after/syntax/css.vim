@@ -59,24 +59,32 @@ let s:colortable=[
 \  [ 0x00, 0xFF, 0xFF ],
 \  [ 0xFF, 0xFF, 0xFF ]]
 
-" xterm color cube
-let valuerange = [ 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF ] " the 6 values used
-for c in range(0, 215)
-  let r = valuerange[ ( c / 36 ) % 6 ]
-  let g = valuerange[ ( c /  6 ) % 6 ]
-  let b = valuerange[   c        % 6 ]
-  let s:colortable += [[r,g,b]]
+for c in range(0, 15)
+  let s:colortable[c] += [c]
 endfor
 
 " grayscale ramp
 for c in range(0, 23)
-  let value = 8 + c * 0x0a
-  let s:colortable += [[value, value, value]]
+  let value = 8 + c * 0x0A
+  let s:colortable += [[value, value, value, 232 + c]]
+endfor
+
+" the 6 values used in the xterm color cube
+let s:valuerange = [ 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF ]
+
+let i = 0
+let s:vquant = []
+for c in range(0, 255)
+  let value = s:valuerange[i]
+  if c == value | let s:vquant += [i] | continue | endif
+  let nextvalue = s:valuerange[i+1]
+  let s:vquant += [ c - value < nextvalue - c ? i : i+1 ]
+  if c >= nextvalue | let i += 1 | endif
 endfor
 
 function! s:distance(c1,c2)
-  let [r1,g1,b1] = a:c1
-  let [r2,g2,b2] = a:c2
+  let [r1,g1,b1] = a:c1[0:2]
+  let [r2,g2,b2] = a:c2[0:2]
   let dr = r2 - r1
   let dg = g2 - g1
   let db = b2 - b1
@@ -93,12 +101,19 @@ function! s:Rgb2xterm(color)
   let b = s:hex[color[5:6]]
   unlet color
   let color = [r,g,b]
-  for c in range(0,255)
-    let d = s:distance(color, s:colortable[c])
-    if d == 0 | return c | endif
+
+  let vr  = s:vquant[r]
+  let vg  = s:vquant[g]
+  let vb  = s:vquant[b]
+  let cidx = vr * 36 + vg * 6 + vb + 16
+  let ccol = [s:valuerange[vr],s:valuerange[vg],s:valuerange[vg],cidx]
+
+  for c in [ ccol ] + s:colortable
+    let d = s:distance( color, c )
+    if d == 0 | return c[3] | endif
     if d < smallest_distance
       let smallest_distance = d
-      let best_match = c
+      let best_match = c[3]
     endif
   endfor
   return best_match
