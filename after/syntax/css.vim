@@ -88,7 +88,8 @@ function! s:Rgb2xterm(color)
   let b = s:hex[color[5:6]]
   for c in range(0,255)
     let d = s:square(s:colortable[c][0]-r) + s:square(s:colortable[c][1]-g) + s:square(s:colortable[c][2]-b)
-    if d<smallest_distance
+    if d == 0 | return c | endif
+    if d < smallest_distance
       let smallest_distance = d
       let best_match = c
     endif
