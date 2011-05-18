@@ -74,8 +74,13 @@ for c in range(0, 23)
   let s:colortable += [[value, value, value]]
 endfor
 
-function! s:square(x)
-  return a:x * a:x
+function! s:distance(c1,c2)
+  let [r1,g1,b1] = a:c1
+  let [r2,g2,b2] = a:c2
+  let dr = r2 - r1
+  let dg = g2 - g1
+  let db = b2 - b1
+  return dr*dr + dg*dg + db*db
 endfunction
 
 " selects the nearest xterm color for a rgb value like #FF0000
@@ -86,8 +91,10 @@ function! s:Rgb2xterm(color)
   let r = s:hex[color[1:2]]
   let g = s:hex[color[3:4]]
   let b = s:hex[color[5:6]]
+  unlet color
+  let color = [r,g,b]
   for c in range(0,255)
-    let d = s:square(s:colortable[c][0]-r) + s:square(s:colortable[c][1]-g) + s:square(s:colortable[c][2]-b)
+    let d = s:distance(color, s:colortable[c])
     if d == 0 | return c | endif
     if d < smallest_distance
       let smallest_distance = d
