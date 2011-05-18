@@ -10,35 +10,6 @@ for i in range(0, 255)
   let s:hex[ printf( '%02x', i ) ] = i
 endfor
 
-function! s:FGforBG(bg)
-  " takes a 6hex color code and returns a matching color that is visible
-  let rgb = matchlist(tolower(a:bg),'^#\(\x\x\)\(\x\x\)\(\x\x\)$')
-  if len( rgb ) == 0 | return '#cccccc' | endif
-  let [r,g,b] = rgb[1:3]
-  return s:hex[r]*30 + s:hex[g]*59 + s:hex[b]*11 > 12000 ? '#000000' : '#ffffff'
-endfunction
-
-function! s:SetMatcher(clr,pat)
-  let group = 'cssColor'.tolower(matchstr(a:clr,'^#\zs.*'))
-  redir => s:currentmatch
-  silent! exe 'syn list' group
-  redir END
-  if s:currentmatch !~ a:pat.'\/'
-    exe 'syn match' group '/'.a:pat.'/ contained'
-    exe 'syn cluster cssColors add='.group
-    if has('gui_running')
-      exe 'hi' group 'guifg='.s:FGforBG(a:clr)
-      exe 'hi' group 'guibg='.a:clr
-    elseif &t_Co == 256
-      exe 'hi' group 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
-      exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr)
-    endif
-    return 1
-  else
-    return 0
-  endif
-endfunction
-
 " xterm color table
 " 16 vt100 colors preset
 let s:colortable=[
@@ -117,6 +88,35 @@ function! s:Rgb2xterm(color)
     endif
   endfor
   return best_match
+endfunction
+
+function! s:FGforBG(bg)
+  " takes a 6hex color code and returns a matching color that is visible
+  let rgb = matchlist(tolower(a:bg),'^#\(\x\x\)\(\x\x\)\(\x\x\)$')
+  if len( rgb ) == 0 | return '#cccccc' | endif
+  let [r,g,b] = rgb[1:3]
+  return s:hex[r]*30 + s:hex[g]*59 + s:hex[b]*11 > 12000 ? '#000000' : '#ffffff'
+endfunction
+
+function! s:SetMatcher(clr,pat)
+  let group = 'cssColor'.tolower(matchstr(a:clr,'^#\zs.*'))
+  redir => s:currentmatch
+  silent! exe 'syn list' group
+  redir END
+  if s:currentmatch !~ a:pat.'\/'
+    exe 'syn match' group '/'.a:pat.'/ contained'
+    exe 'syn cluster cssColors add='.group
+    if has('gui_running')
+      exe 'hi' group 'guifg='.s:FGforBG(a:clr)
+      exe 'hi' group 'guibg='.a:clr
+    elseif &t_Co == 256
+      exe 'hi' group 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
+      exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr)
+    endif
+    return 1
+  else
+    return 0
+  endif
 endfunction
 
 function! s:SetNamedColor(clr,name)
