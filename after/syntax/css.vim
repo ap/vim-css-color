@@ -3,6 +3,7 @@
 " Last Change:  2010 Jul 3
 " Licence:      No Warranties. WTFPL. But please tell me!
 " Version:      0.7.1
+" vim:et:ts=2 sw=2 sts=2
 
 let s:hex={}
 for i in range(0, 255)
