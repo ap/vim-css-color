@@ -129,12 +129,33 @@ function! s:CalcRGBHexColor(r,g,b)
   return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
 endfunction
 
+function! s:CalcHSLHexColor(h,s,l)
+  " Convert 80% -> 0.8, 100% -> 1.0, etc.
+  let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : v:val * 1.0' )
+  " algorithm transcoded to vim from http://www.w3.org/TR/css3-color/#hsl-color
+  let hh = ( a:h % 360 ) / 360.0
+  let m2 = l <= 0.5 ? l * ( s + 1 ) : l + s - l * s
+  let m1 = l * 2 - m2
+  let rgb = []
+  for h in [ hh + (1/3.0), hh, hh - (1/3.0) ]
+    let h = h < 0 ? h + 1 : h > 1 ? h - 1 : h
+    let v =
+          \ h * 6 < 1 ? m1 + ( m2 - m1 ) * h * 6 :
+          \ h * 2 < 1 ? m2 :
+          \ h * 3 < 2 ? m1 + ( m2 - m1 ) * ( 2/3.0 - h ) * 6 :
+          \ m1
+    let rgb += [ float2nr( 255 * v ) ]
+  endfor
+  return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
+endfunction
+
 function! s:PreviewCSSColorInLine()
   " TODO use cssColor matchdata
-  call substitute( substitute( substitute( getline('.'),
+  call substitute( substitute( substitute( substitute( getline('.'),
     \ '#\(\x\)\(\x\)\(\x\)\>', '\=s:SetMatcher(submatch(1).submatch(1).submatch(2).submatch(2).submatch(3).submatch(3), submatch(0))', 'g' ),
     \ '#\(\x\{6}\)\>', '\=s:SetMatcher(submatch(1), submatch(0))', 'g' ),
-    \ 'rgba\?(\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*\%(,[^)]*\)\?)', '\=s:SetMatcher(s:CalcRGBHexColor(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
+    \ 'rgba\?(\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*\%(,[^)]*\)\?)', '\=s:SetMatcher(s:CalcRGBHexColor(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' ),
+    \ 'hsla\?(\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*\%(,[^)]*\)\?)', '\=s:SetMatcher(s:CalcHSLHexColor(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
 endfunction
 
 if has("gui_running") || &t_Co==256
