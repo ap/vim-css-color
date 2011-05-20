@@ -99,11 +99,7 @@ function! s:SetMatcher(color, pattern)
   if currentmatch =~ a:pattern.'\/' | return 0 | endif
   exe 'syn match' group '/'.a:pattern.'/ contained'
   exe 'syn cluster cssColors add='.group
-  if has('gui_running')
-    exe 'hi' group 'guibg=#'.a:color 'guifg=#'.s:FGforBG(a:color)
-  elseif &t_Co == 256
-    exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:color) 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:color))
-  endif
+  exe 'hi' group 'guibg=#'.(a:color) 'guifg=#'.(s:FGforBG(a:color))
   return 1
 endfunction
 
@@ -111,12 +107,21 @@ function! s:SetNamedColor(color, name)
   let group = 'cssColor' . tolower(a:color)
   exe 'syn keyword' group a:name 'contained'
   exe 'syn cluster cssColors add='.group
-  if has('gui_running')
-    exe 'hi' group 'guibg=#'.a:color 'guifg=#'.s:FGforBG(a:color)
-  elseif &t_Co == 256
-    exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:color) 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:color))
-  endif
+  exe 'hi' group 'guibg=#'.(a:color) 'guifg=#'.(s:FGforBG(a:color))
 endfunction
+
+if ( ! has('gui_running') ) && &t_Co == 256
+  " on xterm, recompile code with applicable changes
+  " this avoids having any conditionals on a critical execution path
+  redir => source
+  silent! function s:SetMatcher
+  silent! function s:SetNamedColor
+  redir END
+  let source = substitute( source, '\n[0-9]\+', "\n", 'g' )
+  let source = substitute( source, ' \zsfunction\ze ', 'function!', 'g' )
+  let source = substitute( source, 'gui\([bf]g\)=#''.(', 'cterm\1=''.s:Rgb2xterm(', 'g' )
+  exe source
+endif
 
 function! s:PreviewCSSColorInLine()
   " TODO use cssColor matchdata
