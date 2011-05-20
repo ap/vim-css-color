@@ -53,15 +53,6 @@ for c in range(0, 255)
   if c >= nextvalue | let i += 1 | endif
 endfor
 
-function! s:distance(c1,c2)
-  let [r1,g1,b1] = a:c1[0:2]
-  let [r2,g2,b2] = a:c2[0:2]
-  let dr = r2 - r1
-  let dg = g2 - g1
-  let db = b2 - b1
-  return dr*dr + dg*dg + db*db
-endfunction
-
 " selects the nearest xterm color for a rgb value like #FF0000
 function! s:Rgb2xterm(color)
   let best_match=0
@@ -70,8 +61,6 @@ function! s:Rgb2xterm(color)
   let r = s:hex[color[0:1]]
   let g = s:hex[color[2:3]]
   let b = s:hex[color[4:5]]
-  unlet color
-  let color = [r,g,b]
 
   let vr  = s:vquant[r]
   let vg  = s:vquant[g]
@@ -79,12 +68,15 @@ function! s:Rgb2xterm(color)
   let cidx = vr * 36 + vg * 6 + vb + 16
   let ccol = [s:valuerange[vr],s:valuerange[vg],s:valuerange[vg],cidx]
 
-  for c in [ ccol ] + s:colortable
-    let d = s:distance( color, c )
-    if d == 0 | return c[3] | endif
+  for [tr,tg,tb,idx] in [ ccol ] + s:colortable
+    let dr = tr - r
+    let dg = tg - g
+    let db = tb - b
+    let d = dr*dr + dg*dg + db*db
+    if d == 0 | return idx | endif
     if d < smallest_distance
       let smallest_distance = d
-      let best_match = c[3]
+      let best_match = idx
     endif
   endfor
   return best_match
