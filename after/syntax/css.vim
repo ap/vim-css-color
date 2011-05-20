@@ -107,11 +107,9 @@ function! s:SetMatcher(clr,pat)
     exe 'syn match' group '/'.a:pat.'/ contained'
     exe 'syn cluster cssColors add='.group
     if has('gui_running')
-      exe 'hi' group 'guifg='.s:FGforBG(a:clr)
-      exe 'hi' group 'guibg='.a:clr
+      exe 'hi' group 'guibg='.a:clr 'guifg='.s:FGforBG(a:clr)
     elseif &t_Co == 256
-      exe 'hi' group 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
-      exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr)
+      exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr) 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
     endif
     return 1
   else
@@ -124,11 +122,9 @@ function! s:SetNamedColor(clr,name)
   exe 'syn keyword' group a:name 'contained'
   exe 'syn cluster cssColors add='.group
   if has('gui_running')
-    exe 'hi' group 'guifg='.s:FGforBG(a:clr)
-    exe 'hi' group 'guibg='.a:clr
+    exe 'hi' group 'guibg='.a:clr 'guifg='.s:FGforBG(a:clr)
   elseif &t_Co == 256
-    exe 'hi' group 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
-    exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr)
+    exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr) 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
   endif
 endfunction
 
