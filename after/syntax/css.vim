@@ -93,10 +93,10 @@ endfunction
 
 function! s:SetMatcher(color, pattern)
   let group = 'cssColor' . tolower(a:color)
-  redir => s:currentmatch
+  redir => currentmatch
   silent! exe 'syn list' group
   redir END
-  if s:currentmatch =~ a:pattern.'\/' | return 0 | endif
+  if currentmatch =~ a:pattern.'\/' | return 0 | endif
   exe 'syn match' group '/'.a:pattern.'/ contained'
   exe 'syn cluster cssColors add='.group
   if has('gui_running')
