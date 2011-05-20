@@ -103,18 +103,15 @@ function! s:SetMatcher(clr,pat)
   redir => s:currentmatch
   silent! exe 'syn list' group
   redir END
-  if s:currentmatch !~ a:pat.'\/'
-    exe 'syn match' group '/'.a:pat.'/ contained'
-    exe 'syn cluster cssColors add='.group
-    if has('gui_running')
-      exe 'hi' group 'guibg='.a:clr 'guifg='.s:FGforBG(a:clr)
-    elseif &t_Co == 256
-      exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr) 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
-    endif
-    return 1
-  else
-    return 0
+  if s:currentmatch =~ a:pat.'\/' | return 0 | endif
+  exe 'syn match' group '/'.a:pat.'/ contained'
+  exe 'syn cluster cssColors add='.group
+  if has('gui_running')
+    exe 'hi' group 'guibg='.a:clr 'guifg='.s:FGforBG(a:clr)
+  elseif &t_Co == 256
+    exe 'hi' group 'ctermbg='.s:Rgb2xterm(a:clr) 'ctermfg='.s:Rgb2xterm(s:FGforBG(a:clr))
   endif
+  return 1
 endfunction
 
 function! s:SetNamedColor(clr,name)
