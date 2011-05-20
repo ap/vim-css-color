@@ -1,5 +1,5 @@
 " Language:     Colored CSS Color Preview
-" Author:       Max Vasiliev <vim@skammer.name>
+" Author:       Aristotle Pagaltzis <pagaltzis@gmx.de>
 " Last Change:  2010 Jul 3
 " Licence:      No Warranties. WTFPL. But please tell me!
 " Version:      0.7.1
