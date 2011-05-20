@@ -10,13 +10,6 @@ So here is my patch.
 
 ![Screen shot](https://github.com/skammer/vim-css-color/raw/master/Screen%20shot%202010-07-04%20at%200.19.46.png)
 
-Configuration
--------------
-
-`g:cssColorVimDoNotMessMyUpdatetime` is used when updatetime value set by plugin (100ms) is interfering with your confiduration.
-
-`let g:cssColorVimDoNotMessMyUpdatetime = 1`
-
 Post Scriptum
 -------------
 

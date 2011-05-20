@@ -306,10 +306,6 @@ if has("gui_running") || &t_Co==256
   %call s:PreviewCSSColorInLine()
   call winrestview(view)
 
-  autocmd CursorHold * silent call s:PreviewCSSColorInLine()
-  autocmd CursorHoldI * silent call s:PreviewCSSColorInLine()
-  if !exists('g:cssColorVimDoNotMessMyUpdatetime')
-    set ut=100
-  endif
-
+  autocmd CursorMoved  * silent call s:PreviewCSSColorInLine()
+  autocmd CursorMovedI * silent call s:PreviewCSSColorInLine()
 endif
