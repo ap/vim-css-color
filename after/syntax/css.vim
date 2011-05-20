@@ -134,7 +134,7 @@ function! s:PreviewCSSColorInLine()
   call substitute( substitute( substitute( getline('.'),
     \ '#\(\x\)\(\x\)\(\x\)\>', '\=s:SetMatcher(submatch(1).submatch(1).submatch(2).submatch(2).submatch(3).submatch(3), submatch(0))', 'g' ),
     \ '#\(\x\{6}\)\>', '\=s:SetMatcher(submatch(1), submatch(0))', 'g' ),
-    \ 'rgba\?(\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:SetMatcher(s:CalcRGBHexColor(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
+    \ 'rgba\?(\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*\%(,[^)]*\)\?)', '\=s:SetMatcher(s:CalcRGBHexColor(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
 endfunction
 
 if has("gui_running") || &t_Co==256
