@@ -96,11 +96,11 @@ function! s:SetMatcher(color, pattern)
   redir => currentmatch
   silent! exe 'syn list' group
   redir END
-  if currentmatch =~ a:pattern.'\/' | return 0 | endif
+  if currentmatch =~ a:pattern.'\/' | return '' | endif
   exe 'syn match' group '/'.a:pattern.'/ contained'
   exe 'syn cluster cssColors add='.group
   exe 'hi' group 'guibg=#'.(a:color) 'guifg=#'.(s:FGforBG(a:color))
-  return 1
+  return ''
 endfunction
 
 function! s:SetNamedColor(color, name)
@@ -123,37 +123,18 @@ if ( ! has('gui_running') ) && &t_Co == 256
   exe source
 endif
 
+function! s:CalcRGBHexColor(r,g,b)
+  " Convert 80% -> 204, 100% -> 255, etc.
+  let rgb = map( [a:r,a:g,a:b], 'v:val =~ "%$" ? ( 255 * v:val ) / 100 : v:val' )
+  return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
+endfunction
+
 function! s:PreviewCSSColorInLine()
   " TODO use cssColor matchdata
-  let n = 0
-  while 1
-    let rgb = matchlist( getline('.'), '#\(\x\)\(\x\)\(\x\)\>', 0, n )
-    if len( rgb ) == 0 | break | endif
-    let [r,g,b] = rgb[1:3]
-    call s:SetMatcher( r.r.g.g.b.b, rgb[0] )
-    let n+=1
-  endwhile
-
-  let n = 0
-  while 1
-    let rgb = matchlist( getline('.'), '#\(\x\{6}\)\>', 0, n )
-    if len( rgb ) == 0 | break | endif
-    call s:SetMatcher( rgb[1], rgb[0] )
-    let n+=1
-  endwhile
-
-  let n = 0
-  while 1
-    let rgb = matchlist( getline('.'), 'rgba\?(\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', 0, n )
-    if len( rgb ) == 0 | break | endif
-    for i in [1,2,3]
-      " Convert 80% -> 204, 100% -> 255, etc.
-      if rgb[i] =~ '%$' | let rgb[i] = ( 255 * rgb[i] ) / 100 | endif
-    endfor
-    let color = printf( '%02x%02x%02x', rgb[1], rgb[2], rgb[3] )
-    call s:SetMatcher( color, rgb[0] )
-    let n+=1
-  endwhile
+  call substitute( substitute( substitute( getline('.'),
+    \ '#\(\x\)\(\x\)\(\x\)\>', '\=s:SetMatcher(submatch(1).submatch(1).submatch(2).submatch(2).submatch(3).submatch(3), submatch(0))', 'g' ),
+    \ '#\(\x\{6}\)\>', '\=s:SetMatcher(submatch(1), submatch(0))', 'g' ),
+    \ 'rgba\?(\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:SetMatcher(s:CalcRGBHexColor(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
 endfunction
 
 if has("gui_running") || &t_Co==256
