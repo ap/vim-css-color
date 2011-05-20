@@ -153,14 +153,16 @@ endfunction
 
 if has("gui_running") || &t_Co==256
   " HACK modify cssDefinition to add @cssColors to its contains
-  redir => s:olddef
-  silent!  syn list cssDefinition
+  redir => cssdef
+  silent! syn list cssDefinition
   redir END
-  if s:olddef != ''
-    let s:b = strridx(s:olddef,'matchgroup')
-    if s:b != -1
-      exe 'syn region cssDefinition' strpart(s:olddef,s:b).',@cssColors'
-    endif
+  if len( cssdef )
+    for out in split( cssdef, "\n" )
+      if out !~ '^cssDefinition ' | continue | endif
+      let out = substitute( out, ' \+xxx \+', ' ', '' )
+      let out = substitute( out, ' contains=\zs', '@cssColors,', '' )
+      exe 'syn region' out
+    endfor
   endif
 
   " w3c Colors
