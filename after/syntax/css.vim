@@ -118,12 +118,6 @@ function! s:SetNamedColor(color, name)
   endif
 endfunction
 
-" Convert 80% -> 204, 100% -> 255, etc.
-function! s:cssvalue(value)
-  let percentage = matchstr( a:value, '\(.*\)\ze%$' )
-  return len( percentage ) ? ( 255 * percentage ) / 100 : a:value
-endf
-
 function! s:PreviewCSSColorInLine()
   " TODO use cssColor matchdata
   let n = 0
@@ -147,8 +141,11 @@ function! s:PreviewCSSColorInLine()
   while 1
     let rgb = matchlist( getline('.'), 'rgba\?(\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', 0, n )
     if len( rgb ) == 0 | break | endif
-    let [r,g,b] = rgb[1:3]
-    let color = printf( '%02x%02x%02x', s:cssvalue(r), s:cssvalue(g), s:cssvalue(b) )
+    for i in [1,2,3]
+      " Convert 80% -> 204, 100% -> 255, etc.
+      if rgb[i] =~ '%$' | let rgb[i] = ( 255 * rgb[i] ) / 100 | endif
+    endfor
+    let color = printf( '%02x%02x%02x', rgb[1], rgb[2], rgb[3] )
     call s:SetMatcher( color, rgb[0] )
     let n+=1
   endwhile
