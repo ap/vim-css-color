@@ -21,11 +21,13 @@ endfunction
 
 function! s:MatchColorValue(color, pattern)
   let group = 'cssColor' . tolower(a:color)
+  let pattern = a:pattern
+  if pattern =~ '\>$' | let pattern .= '\>' | endif
   redir => currentmatch
   silent! exe 'syn list' group
   redir END
-  if currentmatch =~ 'match /'.a:pattern | return '' | endif
-  exe 'syn match' group '/'.a:pattern.( a:pattern =~ '\>$' ? '\>' : '' ).'/ contained'
+  if stridx( currentmatch, 'match /'.pattern.'/' ) >= 0 | return '' | endif
+  exe 'syn match' group '/'.pattern.'/ contained'
   exe 'syn cluster cssColors add='.group
   exe 'hi' group 'guibg=#'.(a:color) 'guifg=#'.(s:FGForBG(a:color)) | "extra parens = easier to patch
   return ''
