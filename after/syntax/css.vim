@@ -24,8 +24,8 @@ function! s:MatchColorValue(color, pattern)
   redir => currentmatch
   silent! exe 'syn list' group
   redir END
-  if currentmatch =~ a:pattern.'\/' | return '' | endif
-  exe 'syn match' group '/'.a:pattern.'/ contained'
+  if currentmatch =~ 'match /'.a:pattern | return '' | endif
+  exe 'syn match' group '/'.a:pattern.( a:pattern =~ '\>$' ? '\>' : '' ).'/ contained'
   exe 'syn cluster cssColors add='.group
   exe 'hi' group 'guibg=#'.(a:color) 'guifg=#'.(s:FGForBG(a:color)) | "extra parens = easier to patch
   return ''
