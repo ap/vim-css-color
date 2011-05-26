@@ -340,5 +340,5 @@ if has("gui_running") || &t_Co==256
 
   autocmd CursorMoved  * silent call s:PreviewCSSColorInLine()
   autocmd CursorMovedI * silent call s:PreviewCSSColorInLine()
-  autocmd FileType sass,stylus syn cluster sassCssAttributes add=@cssColors
+  autocmd FileType sass,scss,stylus syn cluster sassCssAttributes add=@cssColors
 endif
