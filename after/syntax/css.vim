@@ -20,6 +20,7 @@ function! s:FGForBG(color)
 endfunction
 
 function! s:MatchColorValue(color, pattern)
+  if ! len(a:color) | return | endif
   let group = 'cssColor' . tolower(a:color)
   let pattern = a:pattern
   if pattern =~ '\>$' | let pattern .= '\>' | endif
@@ -48,7 +49,7 @@ endfunction
 
 function! s:HexForHSLValue(h,s,l)
   " Convert 80% -> 0.8, 100% -> 1.0, etc.
-  let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : v:val * 1.0' )
+  let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : str2float(v:val)' )
   " algorithm transcoded to vim from http://www.w3.org/TR/css3-color/#hsl-color
   let hh = ( a:h % 360 ) / 360.0
   let m2 = l <= 0.5 ? l * ( s + 1 ) : l + s - l * s
@@ -61,6 +62,7 @@ function! s:HexForHSLValue(h,s,l)
           \ h * 2 < 1 ? m2 :
           \ h * 3 < 2 ? m1 + ( m2 - m1 ) * ( 2/3.0 - h ) * 6 :
           \ m1
+    if v > 1.0 | return '' | endif
     let rgb += [ float2nr( 255 * v ) ]
   endfor
   return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
