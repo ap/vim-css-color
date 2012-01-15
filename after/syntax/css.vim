@@ -332,9 +332,13 @@ if has("gui_running") || &t_Co==256
   call s:MatchColorName('F5F5F5', 'WhiteSmoke')
   call s:MatchColorName('9ACD32', 'YellowGreen')
 
-  let view = winsaveview()
-  %call s:PreviewCSSColorInLine()
-  call winrestview(view)
+  function! s:BufEnter()
+    let view = winsaveview()
+    %call s:PreviewCSSColorInLine()
+    call winrestview(view)
+  endfunction
+
+  autocmd BufEnter * call s:BufEnter()
 
   " fix highlighting of "white" in `white-space` etc
   " this really belongs in Vim's own syntax/css.vim ...
