@@ -78,8 +78,8 @@ function! s:PreviewCSSColorInLine()
   call substitute( substitute( substitute( substitute( getline('.'),
     \ '#\(\x\)\(\x\)\(\x\)\>', '\=s:MatchColorValue(submatch(1).submatch(1).submatch(2).submatch(2).submatch(3).submatch(3), submatch(0))', 'g' ),
     \ '#\(\x\{6}\)\>', '\=s:MatchColorValue(submatch(1), submatch(0))', 'g' ),
-    \ 'rgba\?(\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*\%(,[^)]*\)\?)', '\=s:MatchColorValue(s:HexForRGBValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' ),
-    \ 'hsla\?(\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*,\s*\(\d\{1,3}\s*%\?\)\s*\%(,[^)]*\)\?)', '\=s:MatchColorValue(s:HexForHSLValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
+    \ 'rgba\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\(,[^)]\+\)\?)', '\=s:MatchColorValue(s:HexForRGBValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' ),
+    \ 'hsla\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\(,[^)]\+\)\?)', '\=s:MatchColorValue(s:HexForHSLValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
 endfunction
 
 if has("gui_running") || &t_Co==256
@@ -332,9 +332,13 @@ if has("gui_running") || &t_Co==256
   call s:MatchColorName('F5F5F5', 'WhiteSmoke')
   call s:MatchColorName('9ACD32', 'YellowGreen')
 
-  let view = winsaveview()
-  %call s:PreviewCSSColorInLine()
-  call winrestview(view)
+  function! s:BufEnter()
+    let view = winsaveview()
+    %call s:PreviewCSSColorInLine()
+    call winrestview(view)
+  endfunction
+
+  autocmd BufEnter * call s:BufEnter()
 
   " fix highlighting of "white" in `white-space` etc
   " this really belongs in Vim's own syntax/css.vim ...
