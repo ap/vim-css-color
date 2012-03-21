@@ -333,7 +333,7 @@ if has("gui_running") || &t_Co==256
   call s:MatchColorName('9ACD32', 'YellowGreen')
 
   let view = winsaveview()
-  %call s:PreviewCSSColorInLine()
+  exe printf( '%d,%d%s', line('w0'), line('w$'), 'call s:PreviewCSSColorInLine()' )
   call winrestview(view)
 
   " fix highlighting of "white" in `white-space` etc
