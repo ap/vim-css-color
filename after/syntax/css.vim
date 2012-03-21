@@ -82,12 +82,6 @@ function! s:PreviewCSSColorInLine()
     \ 'hsla\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:MatchColorValue(s:HexForHSLValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
 endfunction
 
-function! s:PreviewCSSColorInBuffer()
-  let view = winsaveview()
-  %call s:PreviewCSSColorInLine()
-  call winrestview(view)
-endfunction
-
 if has("gui_running") || &t_Co==256
   " HACK modify cssDefinition to add @cssColors to its contains
   redir => cssdef
@@ -338,11 +332,14 @@ if has("gui_running") || &t_Co==256
   call s:MatchColorName('F5F5F5', 'WhiteSmoke')
   call s:MatchColorName('9ACD32', 'YellowGreen')
 
+  let view = winsaveview()
+  %call s:PreviewCSSColorInLine()
+  call winrestview(view)
+
   " fix highlighting of "white" in `white-space` etc
   " this really belongs in Vim's own syntax/css.vim ...
   setlocal iskeyword+=-
 
-  autocmd BufEnter     * silent call s:PreviewCSSColorInBuffer()
   autocmd CursorMoved  * silent call s:PreviewCSSColorInLine()
   autocmd CursorMovedI * silent call s:PreviewCSSColorInLine()
 endif
