@@ -138,17 +138,21 @@ if has("gui_running") || &t_Co==256
       \ [ 0xEE, 0xEE, 0xEE, 255 ]]
 
     " the 6 values used in the xterm color cube
+    "                    0    95   135   175   215   255
     let s:cubergb = [ 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF ]
 
-    let i = 0
-    let s:xvquant = []
-    for c in range(0, 255)
-      let value = s:cubergb[i]
-      if c == value | let s:xvquant += [i] | continue | endif
-      let nextvalue = s:cubergb[i+1]
-      let s:xvquant += [ c - value < nextvalue - c ? i : i+1 ]
-      if c >= nextvalue | let i += 1 | endif
-    endfor
+    " 0..255 mapped to 0..5 based on the color cube values
+    let s:xvquant = repeat([0],48)
+        \         + repeat([1],68)
+        \         + repeat([2],40)
+        \         + repeat([3],40)
+        \         + repeat([4],40)
+        \         + repeat([5],20)
+    " tweak the mapping for the exact matches (0 and 1 already correct)
+    let s:xvquant[s:cubergb[2]] = 2
+    let s:xvquant[s:cubergb[3]] = 3
+    let s:xvquant[s:cubergb[4]] = 4
+    let s:xvquant[s:cubergb[5]] = 5
 
     " selects the nearest xterm color for a rgb value like #FF0000
     function! s:XTermColorForRGB(color)
