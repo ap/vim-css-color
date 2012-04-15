@@ -30,7 +30,7 @@ function! s:MatchColorValue(color, pattern)
   if stridx( currentmatch, 'match /'.pattern.'/' ) >= 0 | return '' | endif
   exe 'syn match' group '/'.pattern.'/ contained'
   exe 'syn cluster cssColors add='.group
-  exe 'hi' group 'guibg=#'.(a:color) 'guifg=#'.(s:FGForBG(a:color)) | "extra parens = easier to patch
+  exe 'hi' group 'ctermbg='.s:XTermColorForRGB(a:color) 'ctermfg='.s:XTermColorForRGB(s:FGForBG(a:color))
   return ''
 endfunction
 
@@ -182,16 +182,17 @@ if has("gui_running") || &t_Co==256
       return best_match
     endfunction
 
-    " recompile main functions after patching GUI code into console code
+  else
+    " recompile main functions after patching console code for GUI
     " this avoids having any conditionals on a critical execution path
     redir => source
     silent! function s:MatchColorValue
     redir END
     let source = substitute( source, '\n[0-9]\+', "\n", 'g' )
     let source = substitute( source, ' \zsfunction\ze ', 'function!', 'g' )
-    let source = substitute( source, 'gui\([bf]g\)=#''.(', 'cterm\1=''.s:XTermColorForRGB(', 'g' )
+    let source = substitute( source, 'cterm\([bf]g\)=', 'gui\1=#', 'g' )
+    let source = substitute( source, 's:XTermColorForRGB(', '(', 'g' )
     exe source
-
   endif
 
   hi cssColor000000 guibg=#000000 guifg=#FFFFFF ctermbg=16  ctermfg=231 | syn cluster cssColors add=cssColor000000
