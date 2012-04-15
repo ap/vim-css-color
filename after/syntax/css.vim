@@ -10,13 +10,16 @@ for i in range(0, 255)
   let s:hex[ printf( '%02x', i ) ] = i
 endfor
 
+let s:black = '000000'
+let s:white = 'ffffff'
+
 function! s:FGForBG(color)
   " pick suitable text color given a background color
   let color = tolower(a:color)
   let r = s:hex[color[0:1]]
   let g = s:hex[color[2:3]]
   let b = s:hex[color[4:5]]
-  return r*30 + g*59 + b*11 > 12000 ? '000000' : 'ffffff'
+  return r*30 + g*59 + b*11 > 12000 ? s:black : s:white
 endfunction
 
 function! s:MatchColorValue(color, pattern)
@@ -30,7 +33,7 @@ function! s:MatchColorValue(color, pattern)
   if stridx( currentmatch, 'match /'.pattern.'/' ) >= 0 | return '' | endif
   exe 'syn match' group '/'.pattern.'/ contained'
   exe 'syn cluster cssColors add='.group
-  exe 'hi' group 'ctermbg='.s:XTermColorForRGB(a:color) 'ctermfg='.s:XTermColorForRGB(s:FGForBG(a:color))
+  exe 'hi' group 'ctermbg='.s:XTermColorForRGB(a:color) 'ctermfg='.s:FGForBG(a:color)
   return ''
 endfunction
 
@@ -136,6 +139,9 @@ if has("gui_running") || &t_Co==256
       \ [ 0xDA, 0xDA, 0xDA, 253 ],
       \ [ 0xE4, 0xE4, 0xE4, 254 ],
       \ [ 0xEE, 0xEE, 0xEE, 255 ]]
+
+    let s:black = 0
+    let s:white = 15
 
     " the 6 values used in the xterm color cube
     "                    0    95   135   175   215   255
