@@ -10,8 +10,8 @@ for i in range(0, 255)
   let s:hex[ printf( '%02x', i ) ] = i
 endfor
 
-let s:black = '000000'
-let s:white = 'ffffff'
+let s:black = '#000000'
+let s:white = '#ffffff'
 
 function! s:FGForBG(color)
   " pick suitable text color given a background color
@@ -21,6 +21,9 @@ function! s:FGForBG(color)
   let b = s:hex[color[4:5]]
   return r*30 + g*59 + b*11 > 12000 ? s:black : s:white
 endfunction
+
+let s:color_prefix  = 'gui'
+let s:fg_color_calc = 'let color = "#" . a:color'
 
 function! s:MatchColorValue(color, pattern)
   if ! len(a:color) | return | endif
@@ -33,7 +36,8 @@ function! s:MatchColorValue(color, pattern)
   if stridx( currentmatch, 'match /'.pattern.'/' ) >= 0 | return '' | endif
   exe 'syn match' group '/'.pattern.'/ contained'
   exe 'syn cluster cssColors add='.group
-  exe 'hi' group 'ctermbg='.s:XTermColorForRGB(a:color) 'ctermfg='.s:FGForBG(a:color)
+  exe s:fg_color_calc
+  exe 'hi' group s:color_prefix.'bg='.color s:color_prefix.'fg='.s:FGForBG(a:color)
   return ''
 endfunction
 
@@ -94,6 +98,12 @@ if has("gui_running") || &t_Co==256
 
   if ! has('gui_running')
 
+    let s:black = 0
+    let s:white = 15
+
+    let s:color_prefix  = 'cterm'
+    let s:fg_color_calc = 'let color = s:XTermColorForRGB(a:color)'
+
     " preset 16 vt100 colors
     let s:xtermcolor = [
       \ [ 0x00, 0x00, 0x00,  0 ],
@@ -140,9 +150,6 @@ if has("gui_running") || &t_Co==256
       \ [ 0xE4, 0xE4, 0xE4, 254 ],
       \ [ 0xEE, 0xEE, 0xEE, 255 ]]
 
-    let s:black = 0
-    let s:white = 15
-
     " the 6 values used in the xterm color cube
     "                    0    95   135   175   215   255
     let s:cubergb = [ 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF ]
@@ -187,18 +194,6 @@ if has("gui_running") || &t_Co==256
       endfor
       return best_match
     endfunction
-
-  else
-    " recompile main functions after patching console code for GUI
-    " this avoids having any conditionals on a critical execution path
-    redir => source
-    silent! function s:MatchColorValue
-    redir END
-    let source = substitute( source, '\n[0-9]\+', "\n", 'g' )
-    let source = substitute( source, ' \zsfunction\ze ', 'function!', 'g' )
-    let source = substitute( source, 'cterm\([bf]g\)=', 'gui\1=#', 'g' )
-    let source = substitute( source, 's:XTermColorForRGB(', '(', 'g' )
-    exe source
   endif
 
   hi cssColor000000 guibg=#000000 guifg=#FFFFFF ctermbg=16  ctermfg=231 | syn cluster cssColors add=cssColor000000
