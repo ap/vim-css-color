@@ -24,14 +24,13 @@ endfunction
 
 let b:color_pattern = {}
 let s:color_prefix  = 'gui'
-let s:fg_color_calc = 'let color = "#" . a:color'
+let s:fg_color_calc = 'let color = "#" . toupper(a:color)'
 
 function! s:MatchColorValue(color, pattern)
   if ! len(a:color) | return | endif
   if has_key( b:color_pattern, a:pattern ) | return | endif
   let b:color_pattern[a:pattern] = 1
-  let color = tolower(a:color)
-  let group = 'cssColor' . color
+  let group = 'cssColor' . tolower(a:color)
   exe 'syn match' group '/'.a:pattern.'\>/ contained'
   exe 'syn cluster cssColors add='.group
   exe s:fg_color_calc
