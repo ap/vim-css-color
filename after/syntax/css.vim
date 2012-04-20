@@ -22,19 +22,17 @@ function! s:FGForBG(color)
   return r*30 + g*59 + b*11 > 12000 ? s:black : s:white
 endfunction
 
+let b:color_pattern = {}
 let s:color_prefix  = 'gui'
 let s:fg_color_calc = 'let color = "#" . a:color'
 
 function! s:MatchColorValue(color, pattern)
   if ! len(a:color) | return | endif
-  let group = 'cssColor' . tolower(a:color)
-  let pattern = a:pattern
-  if pattern =~ '\>$' | let pattern .= '\>' | endif
-  redir => currentmatch
-  silent! exe 'syn list' group
-  redir END
-  if stridx( currentmatch, 'match /'.pattern.'/' ) >= 0 | return '' | endif
-  exe 'syn match' group '/'.pattern.'/ contained'
+  if has_key( b:color_pattern, a:pattern ) | return | endif
+  let b:color_pattern[a:pattern] = 1
+  let color = tolower(a:color)
+  let group = 'cssColor' . color
+  exe 'syn match' group '/'.a:pattern.'\>/ contained'
   exe 'syn cluster cssColors add='.group
   exe s:fg_color_calc
   exe 'hi' group s:color_prefix.'bg='.color s:color_prefix.'fg='.s:FGForBG(a:color)
