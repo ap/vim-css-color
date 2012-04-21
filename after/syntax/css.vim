@@ -28,10 +28,16 @@ let s:fg_color_calc = 'let color = "#" . toupper(a:color)'
 
 function! s:MatchColorValue(color, pattern)
   if ! len(a:color) | return | endif
+
   if has_key( b:color_pattern, a:pattern ) | return | endif
   let b:color_pattern[a:pattern] = 1
+
+  let pattern = a:pattern
+  " iff pattern ends on word character, require word break to match
+  if pattern =~ '\>$' | let pattern .= '\>' | endif
+
   let group = 'cssColor' . tolower(a:color)
-  exe 'syn match' group '/'.a:pattern.'\>/ contained'
+  exe 'syn match' group '/'.pattern.'/ contained'
   exe 'syn cluster cssColors add='.group
   exe s:fg_color_calc
   exe 'hi' group s:color_prefix.'bg='.color s:color_prefix.'fg='.s:FGForBG(a:color)
