@@ -37,7 +37,7 @@ function! s:MatchColorValue(color, pattern)
   if pattern =~ '\>$' | let pattern .= '\>' | endif
 
   let group = 'cssColor' . tolower(a:color)
-  exe 'syn match' group '/'.pattern.'/ contained'
+  exe 'syn match' group '/'.escape(pattern, '/').'/ contained'
   exe 'syn cluster cssColors add='.group
   exe s:fg_color_calc
   exe 'hi' group s:color_prefix.'bg='.color s:color_prefix.'fg='.s:FGForBG(a:color)
