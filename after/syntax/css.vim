@@ -342,7 +342,7 @@ if has("gui_running") || &t_Co==256
   syn keyword cssColor000000 black   contained
   syn keyword cssColorc0c0c0 silver  contained
   syn keyword cssColor808080 gray    contained
-  syn keyword cssColorffffff white   contained
+  syn match cssColorffffff "\<white\(-\)\@!\>" contained
   syn keyword cssColor800000 maroon  contained
   syn keyword cssColorff0000 red     contained
   syn keyword cssColor800080 purple  contained
@@ -492,10 +492,6 @@ if has("gui_running") || &t_Co==256
   let view = winsaveview()
   %call s:PreviewCSSColorInLine()
   call winrestview(view)
-
-  " fix highlighting of "white" in `white-space` etc
-  " this really belongs in Vim's own syntax/css.vim ...
-  setlocal iskeyword+=-
 
   autocmd CursorMoved  <buffer> silent call s:PreviewCSSColorInLine()
   autocmd CursorMovedI <buffer> silent call s:PreviewCSSColorInLine()
