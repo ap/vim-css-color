@@ -2,7 +2,7 @@
 " Author:       Aristotle Pagaltzis <pagaltzis@gmx.de>
 " Last Change:  2013-03-09
 " Licence:      No Warranties. WTFPL. But please tell me!
-" Version:      0.7.2
+" Version:      0.7.3
 " vim:et:ts=2 sw=2 sts=2
 
 let s:hex={}
