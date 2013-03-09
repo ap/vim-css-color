@@ -183,7 +183,7 @@ if has("gui_running") || &t_Co==256
       let vg = s:xvquant[g]
       let vb = s:xvquant[b]
       let cidx = vr * 36 + vg * 6 + vb + 16
-      let ccol = [ s:cubergb[vr], s:cubergb[vg], s:cubergb[vg], cidx ]
+      let ccol = [ s:cubergb[vr], s:cubergb[vg], s:cubergb[vb], cidx ]
 
       for [tr,tg,tb,idx] in [ ccol ] + s:xtermcolor
         let dr = tr - r
