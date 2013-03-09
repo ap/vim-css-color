@@ -1,8 +1,8 @@
-" Language:     Colored CSS Color Preview
+" Language:     Colorful CSS Color Preview
 " Author:       Aristotle Pagaltzis <pagaltzis@gmx.de>
-" Last Change:  2010 Jul 3
+" Last Change:  2013-03-09
 " Licence:      No Warranties. WTFPL. But please tell me!
-" Version:      0.7.1
+" Version:      0.7.2
 " vim:et:ts=2 sw=2 sts=2
 
 let s:hex={}
