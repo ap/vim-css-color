@@ -4,6 +4,8 @@
 " Licence:      No Warranties. WTFPL. But please tell me!
 " Version:      0.7.3
 " vim:et:ts=2 sw=2 sts=2
+"
+" KNOWN PROBLEMS: compatibility with `cursorline` -- https://github.com/ap/vim-css-color/issues/24
 
 let s:hex={}
 for i in range(0, 255)
