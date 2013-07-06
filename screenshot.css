@@ -1,19 +1,19 @@
 div {
-  blood-is:    red;
-  some-color:  #d13632;
-  next-color:  #e2571e;
-  other-color: #ec883a;
-  hey-color:   #e69333;
-  vim-does-it: #d6a525, #cdb923;
-  rgb-is-ok:   rgb(209, 210, 44);
-  even-string: yellow;
-  for-what:    #96bf33, #666, #fff;
-  for-css:     #479e1b;
-  it-s-good:   rgb(29, 60%, 76), rgb(50, 50%, 126);
-  once-again:  #1d829e;
-  yup:         #503fa9, #8a2aa7;
-  rainbows:    #a8225f;
-  are:         #c83964;
-  beautiful:   #d33264;
-  final:       black,   white;
+	blood-is:    red;
+	some-color:  #d13632;
+	next-color:  #e2571e;
+	other-color: #ec883a;
+	hey-color:   #e69333;
+	vim-does-it: #d6a525, #cdb923;
+	rgb-is-ok:   rgb(209, 210, 44);
+	even-string: yellow;
+	for-what:    #96bf33, #666, #fff;
+	for-css:     #479e1b;
+	it-s-good:   rgb(29, 60%, 76), rgb(50, 50%, 126);
+	once-again:  #1d829e;
+	yup:         #503fa9, #8a2aa7;
+	rainbows:    #a8225f;
+	are:         #c83964;
+	beautiful:   #d33264;
+	final:       black,   white;
 }
