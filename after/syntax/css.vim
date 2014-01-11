@@ -14,6 +14,33 @@ endif
 
 if !( has('gui_running') || &t_Co==256 ) | finish | endif
 
+function! s:RGB2Color(r,g,b)
+  " Convert 80% -> 204, 100% -> 255, etc.
+  let rgb = map( [a:r,a:g,a:b], 'v:val =~ "%$" ? ( 255 * v:val ) / 100 : v:val' )
+  return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
+endfunction
+
+function! s:HSL2Color(h,s,l)
+  " Convert 80% -> 0.8, 100% -> 1.0, etc.
+  let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : str2float(v:val)' )
+  " algorithm transcoded to vim from http://www.w3.org/TR/css3-color/#hsl-color
+  let hh = ( a:h % 360 ) / 360.0
+  let m2 = l <= 0.5 ? l * ( s + 1 ) : l + s - l * s
+  let m1 = l * 2 - m2
+  let rgb = []
+  for h in [ hh + (1/3.0), hh, hh - (1/3.0) ]
+    let h = h < 0 ? h + 1 : h > 1 ? h - 1 : h
+    let v =
+          \ h * 6 < 1 ? m1 + ( m2 - m1 ) * h * 6 :
+          \ h * 2 < 1 ? m2 :
+          \ h * 3 < 2 ? m1 + ( m2 - m1 ) * ( 2/3.0 - h ) * 6 :
+          \ m1
+    if v > 1.0 | return '' | endif
+    let rgb += [ float2nr( 255 * v ) ]
+  endfor
+  return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
+endfunction
+
 let s:hex={}
 for i in range(0, 255)
   let s:hex[ printf( '%02x', i ) ] = i
@@ -51,33 +78,6 @@ function! s:CreateSynMatch(color, pattern)
   return ''
 endfunction
 
-function! s:HexForRGBValue(r,g,b)
-  " Convert 80% -> 204, 100% -> 255, etc.
-  let rgb = map( [a:r,a:g,a:b], 'v:val =~ "%$" ? ( 255 * v:val ) / 100 : v:val' )
-  return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
-endfunction
-
-function! s:HexForHSLValue(h,s,l)
-  " Convert 80% -> 0.8, 100% -> 1.0, etc.
-  let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : str2float(v:val)' )
-  " algorithm transcoded to vim from http://www.w3.org/TR/css3-color/#hsl-color
-  let hh = ( a:h % 360 ) / 360.0
-  let m2 = l <= 0.5 ? l * ( s + 1 ) : l + s - l * s
-  let m1 = l * 2 - m2
-  let rgb = []
-  for h in [ hh + (1/3.0), hh, hh - (1/3.0) ]
-    let h = h < 0 ? h + 1 : h > 1 ? h - 1 : h
-    let v =
-          \ h * 6 < 1 ? m1 + ( m2 - m1 ) * h * 6 :
-          \ h * 2 < 1 ? m2 :
-          \ h * 3 < 2 ? m1 + ( m2 - m1 ) * ( 2/3.0 - h ) * 6 :
-          \ m1
-    if v > 1.0 | return '' | endif
-    let rgb += [ float2nr( 255 * v ) ]
-  endfor
-  return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
-endfunction
-
 function! s:ParseScreen()
   " N.B. these substitute() calls are here just for the side effect
   "      of invoking s:CreateSynMatch during substitution -- because
@@ -86,8 +86,8 @@ function! s:ParseScreen()
   call substitute( substitute( substitute( substitute( join( getline('w0','w$'), "\n" ),
     \ '#\(\x\)\(\x\)\(\x\)\>', '\=s:CreateSynMatch(submatch(1).submatch(1).submatch(2).submatch(2).submatch(3).submatch(3), submatch(0))', 'g' ),
     \ '#\(\x\{6}\)\>', '\=s:CreateSynMatch(submatch(1), submatch(0))', 'g' ),
-    \ 'rgba\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:HexForRGBValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' ),
-    \ 'hsla\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:HexForHSLValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
+    \ 'rgba\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:RGB2Color(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' ),
+    \ 'hsla\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:HSL2Color(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
 endfunction
 
 if ! has('gui_running')
