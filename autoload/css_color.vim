@@ -13,13 +13,13 @@ endif
 
 if !( has('gui_running') || &t_Co==256 ) | finish | endif
 
-function! s:RGB2Color(r,g,b)
+function! s:rgb2color(r,g,b)
 	" Convert 80% -> 204, 100% -> 255, etc.
 	let rgb = map( [a:r,a:g,a:b], 'v:val =~ "%$" ? ( 255 * v:val ) / 100 : v:val' )
 	return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
 endfunction
 
-function! s:HSL2Color(h,s,l)
+function! s:hsl2color(h,s,l)
 	" Convert 80% -> 0.8, 100% -> 1.0, etc.
 	let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : str2float(v:val)' )
 	" algorithm transcoded to vim from http://www.w3.org/TR/css3-color/#hsl-color
@@ -140,7 +140,7 @@ if ! has('gui_running')
 endif
 
 let [s:black, s:white] = has('gui_running') ? ['#000000', '#ffffff'] : [0, 15]
-function! s:FGForBG(color)
+function! s:fg_for_bg(color)
 	" pick suitable text color given a background color
 	let color = tolower(a:color)
 	let r = s:hex[color[0:1]]
@@ -151,7 +151,7 @@ endfunction
 
 let s:color_prefix   = has('gui_running') ? 'gui' : 'cterm'
 let s:syn_color_calc = has('gui_running') ? '"#" . toupper(rgb_color)' : 's:XTermColorForRGB(rgb_color)'
-function! s:CreateSynMatch(color, pattern)
+function! s:create_syn_match(color, pattern)
 
 	if strlen(a:color) == 6
 		let rgb_color = a:color
@@ -171,7 +171,7 @@ function! s:CreateSynMatch(color, pattern)
 	let group = 'cssColor' . tolower(rgb_color)
 	exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
 	exe 'let syn_color =' s:syn_color_calc
-	exe 'hi' group s:color_prefix.'bg='.syn_color s:color_prefix.'fg='.s:FGForBG(rgb_color)
+	exe 'hi' group s:color_prefix.'bg='.syn_color s:color_prefix.'fg='.s:fg_for_bg(rgb_color)
 	return ''
 endfunction
 
@@ -189,9 +189,9 @@ function! css_color#parse_screen()
 	"      match() and friends do not allow finding all matches in a single
 	"      scan without examining the start of the string over and over
 	call substitute( join( getline('w0','w$'), "\n" ), s:_grammar,
-		\   '\=s:CreateSynMatch(('
-		\ . '  submatch(1) == "rgb" ? s:RGB2Color(submatch(2),submatch(3),submatch(4)) :'
-		\ . '  submatch(1) == "hsl" ? s:HSL2Color(submatch(2),submatch(3),submatch(4)) :'
+		\   '\=s:create_syn_match(('
+		\ . '  submatch(1) == "rgb" ? s:rgb2color(submatch(2),submatch(3),submatch(4)) :'
+		\ . '  submatch(1) == "hsl" ? s:hsl2color(submatch(2),submatch(3),submatch(4)) :'
 		\ . '  submatch(5)'
 		\ . '), submatch(0))', 'g' )
 endfunction
