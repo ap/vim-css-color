@@ -444,9 +444,16 @@ endfunction
 
 let b:color_pattern  = {}
 let s:color_prefix   = has('gui_running') ? 'gui' : 'cterm'
-let s:syn_color_calc = has('gui_running') ? '"#" . toupper(a:color)' : 's:XTermColorForRGB(a:color)'
+let s:syn_color_calc = has('gui_running') ? '"#" . toupper(rgb_color)' : 's:XTermColorForRGB(rgb_color)'
 function! s:CreateSynMatch(color, pattern)
-  if ! len(a:color) | return | endif
+
+  if strlen(a:color) == 6
+    let rgb_color = a:color
+  elseif strlen(a:color) == 3
+    let rgb_color = substitute(a:color, '\(.\)', '\1\1', 'g')
+  else
+    return
+  endif
 
   if has_key( b:color_pattern, a:pattern ) | return | endif
   let b:color_pattern[a:pattern] = 1
@@ -455,10 +462,10 @@ function! s:CreateSynMatch(color, pattern)
   " iff pattern ends on word character, require word break to match
   if pattern =~ '\>$' | let pattern .= '\>' | endif
 
-  let group = 'cssColor' . tolower(a:color)
+  let group = 'cssColor' . tolower(rgb_color)
   exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
   exe 'let syn_color =' s:syn_color_calc
-  exe 'hi' group s:color_prefix.'bg='.syn_color s:color_prefix.'fg='.s:FGForBG(a:color)
+  exe 'hi' group s:color_prefix.'bg='.syn_color s:color_prefix.'fg='.s:FGForBG(rgb_color)
   return ''
 endfunction
 
@@ -467,9 +474,8 @@ function! s:ParseScreen()
   "      of invoking s:CreateSynMatch during substitution -- because
   "      match() and friends do not allow finding all matches in a single
   "      scan without examining the start of the string over and over
-  call substitute( substitute( substitute( substitute( join( getline('w0','w$'), "\n" ),
-    \ '#\(\x\)\(\x\)\(\x\)\>', '\=s:CreateSynMatch(submatch(1).submatch(1).submatch(2).submatch(2).submatch(3).submatch(3), submatch(0))', 'g' ),
-    \ '#\(\x\{6}\)\>', '\=s:CreateSynMatch(submatch(1), submatch(0))', 'g' ),
+  call substitute( substitute( substitute( join( getline('w0','w$'), "\n" ),
+    \ '#\(\x\{3}\|\x\{6}\)\>', '\=s:CreateSynMatch(submatch(1), submatch(0))', 'g' ),
     \ 'rgba\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:RGB2Color(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' ),
     \ 'hsla\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:HSL2Color(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
 endfunction
