@@ -442,9 +442,9 @@ function! s:FGForBG(color)
   return r*30 + g*59 + b*11 > 12000 ? s:black : s:white
 endfunction
 
-let b:color_pattern = {}
-let s:color_prefix  = has('gui_running') ? 'gui' : 'cterm'
-let s:fg_color_calc = has('gui_running') ? '"#" . toupper(a:color)' : 's:XTermColorForRGB(a:color)'
+let b:color_pattern  = {}
+let s:color_prefix   = has('gui_running') ? 'gui' : 'cterm'
+let s:syn_color_calc = has('gui_running') ? '"#" . toupper(a:color)' : 's:XTermColorForRGB(a:color)'
 function! s:CreateSynMatch(color, pattern)
   if ! len(a:color) | return | endif
 
@@ -457,8 +457,8 @@ function! s:CreateSynMatch(color, pattern)
 
   let group = 'cssColor' . tolower(a:color)
   exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
-  exe 'let color =' s:fg_color_calc
-  exe 'hi' group s:color_prefix.'bg='.color s:color_prefix.'fg='.s:FGForBG(a:color)
+  exe 'let syn_color =' s:syn_color_calc
+  exe 'hi' group s:color_prefix.'bg='.syn_color s:color_prefix.'fg='.s:FGForBG(a:color)
   return ''
 endfunction
 
