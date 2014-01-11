@@ -194,4 +194,21 @@ function! css_color#parse_screen()
 		\ . '  submatch(1) == "hsl" ? s:hsl2color(submatch(2),submatch(3),submatch(4)) :'
 		\ . '  submatch(5)'
 		\ . '), submatch(0))', 'g' )
+
+	let lnr = line('.')
+	let group = ''
+	let groupstart = 0
+	let endcol = col('$')
+	call filter(b:color_matches, 'matchdelete(v:val)')
+	for col in range( 1, endcol )
+		let nextgroup = col < endcol ? synIDattr( synID( lnr, col, 1 ), 'name' ) : ''
+		if group == nextgroup | continue | endif
+		if group =~ '^cssColor\x\{6}$'
+			let regex = '\%'.lnr.'l\%'.groupstart.'c'.repeat( '.', col - groupstart )
+			let match = matchadd( group, regex, -1 )
+			let b:color_matches += [ match ]
+		endif
+		let group = nextgroup
+		let groupstart = col
+	endfor
 endfunction

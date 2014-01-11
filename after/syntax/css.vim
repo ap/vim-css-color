@@ -296,4 +296,5 @@ syn keyword cssColorf5f5f5 WhiteSmoke           contained containedin=@cssColora
 syn keyword cssColor9acd32 YellowGreen          contained containedin=@cssColorableGroup
 
 let b:color_pattern = {}
+let b:color_matches = []
 autocmd CursorMoved,CursorMovedI <buffer> call css_color#parse_screen()
