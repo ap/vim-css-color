@@ -469,14 +469,25 @@ function! s:CreateSynMatch(color, pattern)
   return ''
 endfunction
 
+let s:_funcname   = '\(rgb\|hsl\)a\?'
+let s:_numval     = '\(\d\{1,3}%\?\)'
+let s:_ws_        = '\s*'
+let s:_listsep    = s:_ws_ . ',' . s:_ws_
+let s:_otherargs_ = '\%(,[^)]*\)\?'
+let s:_funcexpr   = s:_funcname . '[(]' . s:_numval . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_ws_ . s:_otherargs_ . '[)]'
+let s:_hexcolor   = '#\(\x\{3}\|\x\{6}\)\>'
+let s:_grammar    = s:_funcexpr . '\|' . s:_hexcolor
 function! s:ParseScreen()
-  " N.B. these substitute() calls are here just for the side effect
+  " N.B. this substitute() call is here just for the side effect
   "      of invoking s:CreateSynMatch during substitution -- because
   "      match() and friends do not allow finding all matches in a single
   "      scan without examining the start of the string over and over
-  call substitute( substitute( join( getline('w0','w$'), "\n" ),
-    \ '#\(\x\{3}\|\x\{6}\)\>', '\=s:CreateSynMatch(submatch(1), submatch(0))', 'g' ),
-    \ '\(rgb\|hsl\)a\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(submatch(1) == "rgb" ? s:RGB2Color(submatch(2),submatch(3),submatch(4)) : s:HSL2Color(submatch(2),submatch(3),submatch(4)), submatch(0))', 'g' )
+  call substitute( join( getline('w0','w$'), "\n" ), s:_grammar,
+    \   '\=s:CreateSynMatch(('
+    \ . '  submatch(1) == "rgb" ? s:RGB2Color(submatch(2),submatch(3),submatch(4)) :'
+    \ . '  submatch(1) == "hsl" ? s:HSL2Color(submatch(2),submatch(3),submatch(4)) :'
+    \ . '  submatch(5)'
+    \ . '), submatch(0))', 'g' )
 endfunction
 
 call s:ParseScreen()
