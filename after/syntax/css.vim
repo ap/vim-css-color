@@ -1,11 +1,16 @@
 " Language:     Colorful CSS Color Preview
 " Author:       Aristotle Pagaltzis <pagaltzis@gmx.de>
-" Last Change:  2013-03-09
+" Last Change:  2014-01-11
 " Licence:      No Warranties. WTFPL. But please tell me!
-" Version:      0.7.3
+" Version:      0.8
 " vim:et:ts=2 sw=2 sts=2
 "
 " KNOWN PROBLEMS: compatibility with `cursorline` -- https://github.com/ap/vim-css-color/issues/24
+
+if v:version < 700
+	echoerr printf('Vim 7 is required for vim-css-color (this is only %d.%d)',v:version/100,v:version%100)
+	finish
+endif
 
 let s:hex={}
 for i in range(0, 255)
@@ -39,8 +44,7 @@ function! s:MatchColorValue(color, pattern)
   if pattern =~ '\>$' | let pattern .= '\>' | endif
 
   let group = 'cssColor' . tolower(a:color)
-  exe 'syn match' group '/'.escape(pattern, '/').'/ contained'
-  exe 'syn cluster cssColors add='.group
+  exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=cssDefinition'
   exe s:fg_color_calc
   exe 'hi' group s:color_prefix.'bg='.color s:color_prefix.'fg='.s:FGForBG(a:color)
   return ''
@@ -88,20 +92,6 @@ function! s:PreviewCSSColorInLine()
 endfunction
 
 if has("gui_running") || &t_Co==256
-  " HACK modify cssDefinition to add @cssColors to its contains
-  redir => cssdef
-  silent! syn list cssDefinition
-  redir END
-  if len( cssdef )
-    for out in split( cssdef, "\n" )
-      if out !~ '^cssDefinition ' | continue | endif
-      let out = substitute( out, ' \+xxx \+', ' ', '' )
-      let out = substitute( out, ' contains=\zs', '@cssColors,', '' )
-      syn clear cssDefinition
-      exe 'syn region' out
-    endfor
-  endif
-
   if ! has('gui_running')
 
     let s:black = 0
@@ -202,295 +192,295 @@ if has("gui_running") || &t_Co==256
     endfunction
   endif
 
-  hi cssColor000000 guibg=#000000 guifg=#FFFFFF ctermbg=16  ctermfg=231 | syn cluster cssColors add=cssColor000000
-  hi cssColor000080 guibg=#000080 guifg=#FFFFFF ctermbg=235 ctermfg=231 | syn cluster cssColors add=cssColor000080
-  hi cssColor00008b guibg=#00008B guifg=#FFFFFF ctermbg=4   ctermfg=231 | syn cluster cssColors add=cssColor00008b
-  hi cssColor0000cd guibg=#0000CD guifg=#FFFFFF ctermbg=4   ctermfg=231 | syn cluster cssColors add=cssColor0000cd
-  hi cssColor0000ff guibg=#0000FF guifg=#FFFFFF ctermbg=4   ctermfg=231 | syn cluster cssColors add=cssColor0000ff
-  hi cssColor006400 guibg=#006400 guifg=#FFFFFF ctermbg=235 ctermfg=231 | syn cluster cssColors add=cssColor006400
-  hi cssColor008000 guibg=#008000 guifg=#FFFFFF ctermbg=2   ctermfg=231 | syn cluster cssColors add=cssColor008000
-  hi cssColor008080 guibg=#008080 guifg=#FFFFFF ctermbg=30  ctermfg=231 | syn cluster cssColors add=cssColor008080
-  hi cssColor008b8b guibg=#008B8B guifg=#FFFFFF ctermbg=30  ctermfg=231 | syn cluster cssColors add=cssColor008b8b
-  hi cssColor00bfff guibg=#00BFFF guifg=#000000 ctermbg=6   ctermfg=16  | syn cluster cssColors add=cssColor00bfff
-  hi cssColor00ced1 guibg=#00CED1 guifg=#000000 ctermbg=6   ctermfg=16  | syn cluster cssColors add=cssColor00ced1
-  hi cssColor00fa9a guibg=#00FA9A guifg=#000000 ctermbg=6   ctermfg=16  | syn cluster cssColors add=cssColor00fa9a
-  hi cssColor00ff00 guibg=#00FF00 guifg=#000000 ctermbg=10  ctermfg=16  | syn cluster cssColors add=cssColor00ff00
-  hi cssColor00ff7f guibg=#00FF7F guifg=#000000 ctermbg=6   ctermfg=16  | syn cluster cssColors add=cssColor00ff7f
-  hi cssColor00ffff guibg=#00FFFF guifg=#000000 ctermbg=51  ctermfg=16  | syn cluster cssColors add=cssColor00ffff
-  hi cssColor191970 guibg=#191970 guifg=#FFFFFF ctermbg=237 ctermfg=231 | syn cluster cssColors add=cssColor191970
-  hi cssColor1e90ff guibg=#1E90FF guifg=#000000 ctermbg=12  ctermfg=16  | syn cluster cssColors add=cssColor1e90ff
-  hi cssColor20b2aa guibg=#20B2AA guifg=#000000 ctermbg=37  ctermfg=16  | syn cluster cssColors add=cssColor20b2aa
-  hi cssColor228b22 guibg=#228B22 guifg=#FFFFFF ctermbg=2   ctermfg=231 | syn cluster cssColors add=cssColor228b22
-  hi cssColor2e8b57 guibg=#2E8B57 guifg=#FFFFFF ctermbg=240 ctermfg=231 | syn cluster cssColors add=cssColor2e8b57
-  hi cssColor2f4f4f guibg=#2F4F4F guifg=#FFFFFF ctermbg=238 ctermfg=231 | syn cluster cssColors add=cssColor2f4f4f
-  hi cssColor32cd32 guibg=#32CD32 guifg=#000000 ctermbg=2   ctermfg=16  | syn cluster cssColors add=cssColor32cd32
-  hi cssColor3cb371 guibg=#3CB371 guifg=#000000 ctermbg=71  ctermfg=16  | syn cluster cssColors add=cssColor3cb371
-  hi cssColor40e0d0 guibg=#40E0D0 guifg=#000000 ctermbg=80  ctermfg=16  | syn cluster cssColors add=cssColor40e0d0
-  hi cssColor4169e1 guibg=#4169E1 guifg=#FFFFFF ctermbg=12  ctermfg=231 | syn cluster cssColors add=cssColor4169e1
-  hi cssColor4682b4 guibg=#4682B4 guifg=#FFFFFF ctermbg=67  ctermfg=231 | syn cluster cssColors add=cssColor4682b4
-  hi cssColor483d8b guibg=#483D8B guifg=#FFFFFF ctermbg=240 ctermfg=231 | syn cluster cssColors add=cssColor483d8b
-  hi cssColor48d1cc guibg=#48D1CC guifg=#000000 ctermbg=80  ctermfg=16  | syn cluster cssColors add=cssColor48d1cc
-  hi cssColor4b0082 guibg=#4B0082 guifg=#FFFFFF ctermbg=238 ctermfg=231 | syn cluster cssColors add=cssColor4b0082
-  hi cssColor556b2f guibg=#556B2F guifg=#FFFFFF ctermbg=239 ctermfg=231 | syn cluster cssColors add=cssColor556b2f
-  hi cssColor5f9ea0 guibg=#5F9EA0 guifg=#000000 ctermbg=73  ctermfg=16  | syn cluster cssColors add=cssColor5f9ea0
-  hi cssColor6495ed guibg=#6495ED guifg=#000000 ctermbg=12  ctermfg=16  | syn cluster cssColors add=cssColor6495ed
-  hi cssColor66cdaa guibg=#66CDAA guifg=#000000 ctermbg=79  ctermfg=16  | syn cluster cssColors add=cssColor66cdaa
-  hi cssColor696969 guibg=#696969 guifg=#FFFFFF ctermbg=242 ctermfg=231 | syn cluster cssColors add=cssColor696969
-  hi cssColor6a5acd guibg=#6A5ACD guifg=#FFFFFF ctermbg=12  ctermfg=231 | syn cluster cssColors add=cssColor6a5acd
-  hi cssColor6b8e23 guibg=#6B8E23 guifg=#FFFFFF ctermbg=241 ctermfg=231 | syn cluster cssColors add=cssColor6b8e23
-  hi cssColor708090 guibg=#708090 guifg=#000000 ctermbg=66  ctermfg=16  | syn cluster cssColors add=cssColor708090
-  hi cssColor778899 guibg=#778899 guifg=#000000 ctermbg=102 ctermfg=16  | syn cluster cssColors add=cssColor778899
-  hi cssColor7b68ee guibg=#7B68EE guifg=#000000 ctermbg=12  ctermfg=16  | syn cluster cssColors add=cssColor7b68ee
-  hi cssColor7cfc00 guibg=#7CFC00 guifg=#000000 ctermbg=3   ctermfg=16  | syn cluster cssColors add=cssColor7cfc00
-  hi cssColor7fff00 guibg=#7FFF00 guifg=#000000 ctermbg=3   ctermfg=16  | syn cluster cssColors add=cssColor7fff00
-  hi cssColor7fffd4 guibg=#7FFFD4 guifg=#000000 ctermbg=122 ctermfg=16  | syn cluster cssColors add=cssColor7fffd4
-  hi cssColor800000 guibg=#800000 guifg=#FFFFFF ctermbg=88  ctermfg=231 | syn cluster cssColors add=cssColor800000
-  hi cssColor800080 guibg=#800080 guifg=#FFFFFF ctermbg=240 ctermfg=231 | syn cluster cssColors add=cssColor800080
-  hi cssColor808000 guibg=#808000 guifg=#FFFFFF ctermbg=240 ctermfg=231 | syn cluster cssColors add=cssColor808000
-  hi cssColor808080 guibg=#808080 guifg=#000000 ctermbg=244 ctermfg=16  | syn cluster cssColors add=cssColor808080
-  hi cssColor87ceeb guibg=#87CEEB guifg=#000000 ctermbg=117 ctermfg=16  | syn cluster cssColors add=cssColor87ceeb
-  hi cssColor87cefa guibg=#87CEFA guifg=#000000 ctermbg=117 ctermfg=16  | syn cluster cssColors add=cssColor87cefa
-  hi cssColor8a2be2 guibg=#8A2BE2 guifg=#FFFFFF ctermbg=12  ctermfg=231 | syn cluster cssColors add=cssColor8a2be2
-  hi cssColor8b0000 guibg=#8B0000 guifg=#FFFFFF ctermbg=88  ctermfg=231 | syn cluster cssColors add=cssColor8b0000
-  hi cssColor8b008b guibg=#8B008B guifg=#FFFFFF ctermbg=5   ctermfg=231 | syn cluster cssColors add=cssColor8b008b
-  hi cssColor8b4513 guibg=#8B4513 guifg=#FFFFFF ctermbg=94  ctermfg=231 | syn cluster cssColors add=cssColor8b4513
-  hi cssColor8fbc8f guibg=#8FBC8F guifg=#000000 ctermbg=108 ctermfg=16  | syn cluster cssColors add=cssColor8fbc8f
-  hi cssColor90ee90 guibg=#90EE90 guifg=#000000 ctermbg=249 ctermfg=16  | syn cluster cssColors add=cssColor90ee90
-  hi cssColor9370d8 guibg=#9370D8 guifg=#000000 ctermbg=12  ctermfg=16  | syn cluster cssColors add=cssColor9370d8
-  hi cssColor9400d3 guibg=#9400D3 guifg=#FFFFFF ctermbg=5   ctermfg=231 | syn cluster cssColors add=cssColor9400d3
-  hi cssColor98fb98 guibg=#98FB98 guifg=#000000 ctermbg=250 ctermfg=16  | syn cluster cssColors add=cssColor98fb98
-  hi cssColor9932cc guibg=#9932CC guifg=#FFFFFF ctermbg=5   ctermfg=231 | syn cluster cssColors add=cssColor9932cc
-  hi cssColor9acd32 guibg=#9ACD32 guifg=#000000 ctermbg=3   ctermfg=16  | syn cluster cssColors add=cssColor9acd32
-  hi cssColora0522d guibg=#A0522D guifg=#FFFFFF ctermbg=130 ctermfg=231 | syn cluster cssColors add=cssColora0522d
-  hi cssColora52a2a guibg=#A52A2A guifg=#FFFFFF ctermbg=124 ctermfg=231 | syn cluster cssColors add=cssColora52a2a
-  hi cssColora9a9a9 guibg=#A9A9A9 guifg=#000000 ctermbg=248 ctermfg=16  | syn cluster cssColors add=cssColora9a9a9
-  hi cssColoradd8e6 guibg=#ADD8E6 guifg=#000000 ctermbg=152 ctermfg=16  | syn cluster cssColors add=cssColoradd8e6
-  hi cssColoradff2f guibg=#ADFF2F guifg=#000000 ctermbg=3   ctermfg=16  | syn cluster cssColors add=cssColoradff2f
-  hi cssColorafeeee guibg=#AFEEEE guifg=#000000 ctermbg=159 ctermfg=16  | syn cluster cssColors add=cssColorafeeee
-  hi cssColorb0c4de guibg=#B0C4DE guifg=#000000 ctermbg=152 ctermfg=16  | syn cluster cssColors add=cssColorb0c4de
-  hi cssColorb0e0e6 guibg=#B0E0E6 guifg=#000000 ctermbg=152 ctermfg=16  | syn cluster cssColors add=cssColorb0e0e6
-  hi cssColorb22222 guibg=#B22222 guifg=#FFFFFF ctermbg=124 ctermfg=231 | syn cluster cssColors add=cssColorb22222
-  hi cssColorb8860b guibg=#B8860B guifg=#000000 ctermbg=3   ctermfg=16  | syn cluster cssColors add=cssColorb8860b
-  hi cssColorba55d3 guibg=#BA55D3 guifg=#000000 ctermbg=5   ctermfg=16  | syn cluster cssColors add=cssColorba55d3
-  hi cssColorbc8f8f guibg=#BC8F8F guifg=#000000 ctermbg=138 ctermfg=16  | syn cluster cssColors add=cssColorbc8f8f
-  hi cssColorbdb76b guibg=#BDB76B guifg=#000000 ctermbg=247 ctermfg=16  | syn cluster cssColors add=cssColorbdb76b
-  hi cssColorc0c0c0 guibg=#C0C0C0 guifg=#000000 ctermbg=250 ctermfg=16  | syn cluster cssColors add=cssColorc0c0c0
-  hi cssColorc71585 guibg=#C71585 guifg=#FFFFFF ctermbg=5   ctermfg=231 | syn cluster cssColors add=cssColorc71585
-  hi cssColorcd5c5c guibg=#CD5C5C guifg=#000000 ctermbg=167 ctermfg=16  | syn cluster cssColors add=cssColorcd5c5c
-  hi cssColorcd853f guibg=#CD853F guifg=#000000 ctermbg=173 ctermfg=16  | syn cluster cssColors add=cssColorcd853f
-  hi cssColord2691e guibg=#D2691E guifg=#000000 ctermbg=166 ctermfg=16  | syn cluster cssColors add=cssColord2691e
-  hi cssColord2b48c guibg=#D2B48C guifg=#000000 ctermbg=180 ctermfg=16  | syn cluster cssColors add=cssColord2b48c
-  hi cssColord3d3d3 guibg=#D3D3D3 guifg=#000000 ctermbg=252 ctermfg=16  | syn cluster cssColors add=cssColord3d3d3
-  hi cssColord87093 guibg=#D87093 guifg=#000000 ctermbg=168 ctermfg=16  | syn cluster cssColors add=cssColord87093
-  hi cssColord8bfd8 guibg=#D8BFD8 guifg=#000000 ctermbg=252 ctermfg=16  | syn cluster cssColors add=cssColord8bfd8
-  hi cssColorda70d6 guibg=#DA70D6 guifg=#000000 ctermbg=249 ctermfg=16  | syn cluster cssColors add=cssColorda70d6
-  hi cssColordaa520 guibg=#DAA520 guifg=#000000 ctermbg=3   ctermfg=16  | syn cluster cssColors add=cssColordaa520
-  hi cssColordc143c guibg=#DC143C guifg=#FFFFFF ctermbg=161 ctermfg=231 | syn cluster cssColors add=cssColordc143c
-  hi cssColordcdcdc guibg=#DCDCDC guifg=#000000 ctermbg=253 ctermfg=16  | syn cluster cssColors add=cssColordcdcdc
-  hi cssColordda0dd guibg=#DDA0DD guifg=#000000 ctermbg=182 ctermfg=16  | syn cluster cssColors add=cssColordda0dd
-  hi cssColordeb887 guibg=#DEB887 guifg=#000000 ctermbg=180 ctermfg=16  | syn cluster cssColors add=cssColordeb887
-  hi cssColore0ffff guibg=#E0FFFF guifg=#000000 ctermbg=195 ctermfg=16  | syn cluster cssColors add=cssColore0ffff
-  hi cssColore6e6fa guibg=#E6E6FA guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColore6e6fa
-  hi cssColore9967a guibg=#E9967A guifg=#000000 ctermbg=174 ctermfg=16  | syn cluster cssColors add=cssColore9967a
-  hi cssColoree82ee guibg=#EE82EE guifg=#000000 ctermbg=251 ctermfg=16  | syn cluster cssColors add=cssColoree82ee
-  hi cssColoreee8aa guibg=#EEE8AA guifg=#000000 ctermbg=223 ctermfg=16  | syn cluster cssColors add=cssColoreee8aa
-  hi cssColorf08080 guibg=#F08080 guifg=#000000 ctermbg=210 ctermfg=16  | syn cluster cssColors add=cssColorf08080
-  hi cssColorf0e68c guibg=#F0E68C guifg=#000000 ctermbg=222 ctermfg=16  | syn cluster cssColors add=cssColorf0e68c
-  hi cssColorf0f8ff guibg=#F0F8FF guifg=#000000 ctermbg=15  ctermfg=16  | syn cluster cssColors add=cssColorf0f8ff
-  hi cssColorf0fff0 guibg=#F0FFF0 guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColorf0fff0
-  hi cssColorf0ffff guibg=#F0FFFF guifg=#000000 ctermbg=15  ctermfg=16  | syn cluster cssColors add=cssColorf0ffff
-  hi cssColorf4a460 guibg=#F4A460 guifg=#000000 ctermbg=215 ctermfg=16  | syn cluster cssColors add=cssColorf4a460
-  hi cssColorf5deb3 guibg=#F5DEB3 guifg=#000000 ctermbg=223 ctermfg=16  | syn cluster cssColors add=cssColorf5deb3
-  hi cssColorf5f5dc guibg=#F5F5DC guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColorf5f5dc
-  hi cssColorf5f5f5 guibg=#F5F5F5 guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColorf5f5f5
-  hi cssColorf5fffa guibg=#F5FFFA guifg=#000000 ctermbg=15  ctermfg=16  | syn cluster cssColors add=cssColorf5fffa
-  hi cssColorf8f8ff guibg=#F8F8FF guifg=#000000 ctermbg=15  ctermfg=16  | syn cluster cssColors add=cssColorf8f8ff
-  hi cssColorfa8072 guibg=#FA8072 guifg=#000000 ctermbg=209 ctermfg=16  | syn cluster cssColors add=cssColorfa8072
-  hi cssColorfaebd7 guibg=#FAEBD7 guifg=#000000 ctermbg=7   ctermfg=16  | syn cluster cssColors add=cssColorfaebd7
-  hi cssColorfaf0e6 guibg=#FAF0E6 guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColorfaf0e6
-  hi cssColorfafad2 guibg=#FAFAD2 guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColorfafad2
-  hi cssColorfdf5e6 guibg=#FDF5E6 guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColorfdf5e6
-  hi cssColorff0000 guibg=#FF0000 guifg=#FFFFFF ctermbg=196 ctermfg=231 | syn cluster cssColors add=cssColorff0000
-  hi cssColorff00ff guibg=#FF00FF guifg=#FFFFFF ctermbg=13  ctermfg=231 | syn cluster cssColors add=cssColorff00ff
-  hi cssColorff1493 guibg=#FF1493 guifg=#FFFFFF ctermbg=5   ctermfg=231 | syn cluster cssColors add=cssColorff1493
-  hi cssColorff4500 guibg=#FF4500 guifg=#FFFFFF ctermbg=9   ctermfg=231 | syn cluster cssColors add=cssColorff4500
-  hi cssColorff6347 guibg=#FF6347 guifg=#000000 ctermbg=203 ctermfg=16  | syn cluster cssColors add=cssColorff6347
-  hi cssColorff69b4 guibg=#FF69B4 guifg=#000000 ctermbg=205 ctermfg=16  | syn cluster cssColors add=cssColorff69b4
-  hi cssColorff7f50 guibg=#FF7F50 guifg=#000000 ctermbg=209 ctermfg=16  | syn cluster cssColors add=cssColorff7f50
-  hi cssColorff8c00 guibg=#FF8C00 guifg=#000000 ctermbg=3   ctermfg=16  | syn cluster cssColors add=cssColorff8c00
-  hi cssColorffa07a guibg=#FFA07A guifg=#000000 ctermbg=216 ctermfg=16  | syn cluster cssColors add=cssColorffa07a
-  hi cssColorffa500 guibg=#FFA500 guifg=#000000 ctermbg=3   ctermfg=16  | syn cluster cssColors add=cssColorffa500
-  hi cssColorffb6c1 guibg=#FFB6C1 guifg=#000000 ctermbg=217 ctermfg=16  | syn cluster cssColors add=cssColorffb6c1
-  hi cssColorffc0cb guibg=#FFC0CB guifg=#000000 ctermbg=218 ctermfg=16  | syn cluster cssColors add=cssColorffc0cb
-  hi cssColorffd700 guibg=#FFD700 guifg=#000000 ctermbg=11  ctermfg=16  | syn cluster cssColors add=cssColorffd700
-  hi cssColorffdab9 guibg=#FFDAB9 guifg=#000000 ctermbg=223 ctermfg=16  | syn cluster cssColors add=cssColorffdab9
-  hi cssColorffdead guibg=#FFDEAD guifg=#000000 ctermbg=223 ctermfg=16  | syn cluster cssColors add=cssColorffdead
-  hi cssColorffe4b5 guibg=#FFE4B5 guifg=#000000 ctermbg=223 ctermfg=16  | syn cluster cssColors add=cssColorffe4b5
-  hi cssColorffe4c4 guibg=#FFE4C4 guifg=#000000 ctermbg=224 ctermfg=16  | syn cluster cssColors add=cssColorffe4c4
-  hi cssColorffe4e1 guibg=#FFE4E1 guifg=#000000 ctermbg=224 ctermfg=16  | syn cluster cssColors add=cssColorffe4e1
-  hi cssColorffebcd guibg=#FFEBCD guifg=#000000 ctermbg=7   ctermfg=16  | syn cluster cssColors add=cssColorffebcd
-  hi cssColorffefd5 guibg=#FFEFD5 guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColorffefd5
-  hi cssColorfff0f5 guibg=#FFF0F5 guifg=#000000 ctermbg=15  ctermfg=16  | syn cluster cssColors add=cssColorfff0f5
-  hi cssColorfff5ee guibg=#FFF5EE guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColorfff5ee
-  hi cssColorfff8dc guibg=#FFF8DC guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColorfff8dc
-  hi cssColorfffacd guibg=#FFFACD guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColorfffacd
-  hi cssColorfffaf0 guibg=#FFFAF0 guifg=#000000 ctermbg=15  ctermfg=16  | syn cluster cssColors add=cssColorfffaf0
-  hi cssColorfffafa guibg=#FFFAFA guifg=#000000 ctermbg=15  ctermfg=16  | syn cluster cssColors add=cssColorfffafa
-  hi cssColorffff00 guibg=#FFFF00 guifg=#000000 ctermbg=11  ctermfg=16  | syn cluster cssColors add=cssColorffff00
-  hi cssColorffffe0 guibg=#FFFFE0 guifg=#000000 ctermbg=255 ctermfg=16  | syn cluster cssColors add=cssColorffffe0
-  hi cssColorfffff0 guibg=#FFFFF0 guifg=#000000 ctermbg=15  ctermfg=16  | syn cluster cssColors add=cssColorfffff0
-  hi cssColorffffff guibg=#FFFFFF guifg=#000000 ctermbg=231 ctermfg=16  | syn cluster cssColors add=cssColorffffff
+  hi cssColor000000 guibg=#000000 guifg=#FFFFFF ctermbg=16  ctermfg=231
+  hi cssColor000080 guibg=#000080 guifg=#FFFFFF ctermbg=235 ctermfg=231
+  hi cssColor00008b guibg=#00008B guifg=#FFFFFF ctermbg=4   ctermfg=231
+  hi cssColor0000cd guibg=#0000CD guifg=#FFFFFF ctermbg=4   ctermfg=231
+  hi cssColor0000ff guibg=#0000FF guifg=#FFFFFF ctermbg=4   ctermfg=231
+  hi cssColor006400 guibg=#006400 guifg=#FFFFFF ctermbg=235 ctermfg=231
+  hi cssColor008000 guibg=#008000 guifg=#FFFFFF ctermbg=2   ctermfg=231
+  hi cssColor008080 guibg=#008080 guifg=#FFFFFF ctermbg=30  ctermfg=231
+  hi cssColor008b8b guibg=#008B8B guifg=#FFFFFF ctermbg=30  ctermfg=231
+  hi cssColor00bfff guibg=#00BFFF guifg=#000000 ctermbg=6   ctermfg=16
+  hi cssColor00ced1 guibg=#00CED1 guifg=#000000 ctermbg=6   ctermfg=16
+  hi cssColor00fa9a guibg=#00FA9A guifg=#000000 ctermbg=6   ctermfg=16
+  hi cssColor00ff00 guibg=#00FF00 guifg=#000000 ctermbg=10  ctermfg=16
+  hi cssColor00ff7f guibg=#00FF7F guifg=#000000 ctermbg=6   ctermfg=16
+  hi cssColor00ffff guibg=#00FFFF guifg=#000000 ctermbg=51  ctermfg=16
+  hi cssColor191970 guibg=#191970 guifg=#FFFFFF ctermbg=237 ctermfg=231
+  hi cssColor1e90ff guibg=#1E90FF guifg=#000000 ctermbg=12  ctermfg=16
+  hi cssColor20b2aa guibg=#20B2AA guifg=#000000 ctermbg=37  ctermfg=16
+  hi cssColor228b22 guibg=#228B22 guifg=#FFFFFF ctermbg=2   ctermfg=231
+  hi cssColor2e8b57 guibg=#2E8B57 guifg=#FFFFFF ctermbg=240 ctermfg=231
+  hi cssColor2f4f4f guibg=#2F4F4F guifg=#FFFFFF ctermbg=238 ctermfg=231
+  hi cssColor32cd32 guibg=#32CD32 guifg=#000000 ctermbg=2   ctermfg=16
+  hi cssColor3cb371 guibg=#3CB371 guifg=#000000 ctermbg=71  ctermfg=16
+  hi cssColor40e0d0 guibg=#40E0D0 guifg=#000000 ctermbg=80  ctermfg=16
+  hi cssColor4169e1 guibg=#4169E1 guifg=#FFFFFF ctermbg=12  ctermfg=231
+  hi cssColor4682b4 guibg=#4682B4 guifg=#FFFFFF ctermbg=67  ctermfg=231
+  hi cssColor483d8b guibg=#483D8B guifg=#FFFFFF ctermbg=240 ctermfg=231
+  hi cssColor48d1cc guibg=#48D1CC guifg=#000000 ctermbg=80  ctermfg=16
+  hi cssColor4b0082 guibg=#4B0082 guifg=#FFFFFF ctermbg=238 ctermfg=231
+  hi cssColor556b2f guibg=#556B2F guifg=#FFFFFF ctermbg=239 ctermfg=231
+  hi cssColor5f9ea0 guibg=#5F9EA0 guifg=#000000 ctermbg=73  ctermfg=16
+  hi cssColor6495ed guibg=#6495ED guifg=#000000 ctermbg=12  ctermfg=16
+  hi cssColor66cdaa guibg=#66CDAA guifg=#000000 ctermbg=79  ctermfg=16
+  hi cssColor696969 guibg=#696969 guifg=#FFFFFF ctermbg=242 ctermfg=231
+  hi cssColor6a5acd guibg=#6A5ACD guifg=#FFFFFF ctermbg=12  ctermfg=231
+  hi cssColor6b8e23 guibg=#6B8E23 guifg=#FFFFFF ctermbg=241 ctermfg=231
+  hi cssColor708090 guibg=#708090 guifg=#000000 ctermbg=66  ctermfg=16
+  hi cssColor778899 guibg=#778899 guifg=#000000 ctermbg=102 ctermfg=16
+  hi cssColor7b68ee guibg=#7B68EE guifg=#000000 ctermbg=12  ctermfg=16
+  hi cssColor7cfc00 guibg=#7CFC00 guifg=#000000 ctermbg=3   ctermfg=16
+  hi cssColor7fff00 guibg=#7FFF00 guifg=#000000 ctermbg=3   ctermfg=16
+  hi cssColor7fffd4 guibg=#7FFFD4 guifg=#000000 ctermbg=122 ctermfg=16
+  hi cssColor800000 guibg=#800000 guifg=#FFFFFF ctermbg=88  ctermfg=231
+  hi cssColor800080 guibg=#800080 guifg=#FFFFFF ctermbg=240 ctermfg=231
+  hi cssColor808000 guibg=#808000 guifg=#FFFFFF ctermbg=240 ctermfg=231
+  hi cssColor808080 guibg=#808080 guifg=#000000 ctermbg=244 ctermfg=16
+  hi cssColor87ceeb guibg=#87CEEB guifg=#000000 ctermbg=117 ctermfg=16
+  hi cssColor87cefa guibg=#87CEFA guifg=#000000 ctermbg=117 ctermfg=16
+  hi cssColor8a2be2 guibg=#8A2BE2 guifg=#FFFFFF ctermbg=12  ctermfg=231
+  hi cssColor8b0000 guibg=#8B0000 guifg=#FFFFFF ctermbg=88  ctermfg=231
+  hi cssColor8b008b guibg=#8B008B guifg=#FFFFFF ctermbg=5   ctermfg=231
+  hi cssColor8b4513 guibg=#8B4513 guifg=#FFFFFF ctermbg=94  ctermfg=231
+  hi cssColor8fbc8f guibg=#8FBC8F guifg=#000000 ctermbg=108 ctermfg=16
+  hi cssColor90ee90 guibg=#90EE90 guifg=#000000 ctermbg=249 ctermfg=16
+  hi cssColor9370d8 guibg=#9370D8 guifg=#000000 ctermbg=12  ctermfg=16
+  hi cssColor9400d3 guibg=#9400D3 guifg=#FFFFFF ctermbg=5   ctermfg=231
+  hi cssColor98fb98 guibg=#98FB98 guifg=#000000 ctermbg=250 ctermfg=16
+  hi cssColor9932cc guibg=#9932CC guifg=#FFFFFF ctermbg=5   ctermfg=231
+  hi cssColor9acd32 guibg=#9ACD32 guifg=#000000 ctermbg=3   ctermfg=16
+  hi cssColora0522d guibg=#A0522D guifg=#FFFFFF ctermbg=130 ctermfg=231
+  hi cssColora52a2a guibg=#A52A2A guifg=#FFFFFF ctermbg=124 ctermfg=231
+  hi cssColora9a9a9 guibg=#A9A9A9 guifg=#000000 ctermbg=248 ctermfg=16
+  hi cssColoradd8e6 guibg=#ADD8E6 guifg=#000000 ctermbg=152 ctermfg=16
+  hi cssColoradff2f guibg=#ADFF2F guifg=#000000 ctermbg=3   ctermfg=16
+  hi cssColorafeeee guibg=#AFEEEE guifg=#000000 ctermbg=159 ctermfg=16
+  hi cssColorb0c4de guibg=#B0C4DE guifg=#000000 ctermbg=152 ctermfg=16
+  hi cssColorb0e0e6 guibg=#B0E0E6 guifg=#000000 ctermbg=152 ctermfg=16
+  hi cssColorb22222 guibg=#B22222 guifg=#FFFFFF ctermbg=124 ctermfg=231
+  hi cssColorb8860b guibg=#B8860B guifg=#000000 ctermbg=3   ctermfg=16
+  hi cssColorba55d3 guibg=#BA55D3 guifg=#000000 ctermbg=5   ctermfg=16
+  hi cssColorbc8f8f guibg=#BC8F8F guifg=#000000 ctermbg=138 ctermfg=16
+  hi cssColorbdb76b guibg=#BDB76B guifg=#000000 ctermbg=247 ctermfg=16
+  hi cssColorc0c0c0 guibg=#C0C0C0 guifg=#000000 ctermbg=250 ctermfg=16
+  hi cssColorc71585 guibg=#C71585 guifg=#FFFFFF ctermbg=5   ctermfg=231
+  hi cssColorcd5c5c guibg=#CD5C5C guifg=#000000 ctermbg=167 ctermfg=16
+  hi cssColorcd853f guibg=#CD853F guifg=#000000 ctermbg=173 ctermfg=16
+  hi cssColord2691e guibg=#D2691E guifg=#000000 ctermbg=166 ctermfg=16
+  hi cssColord2b48c guibg=#D2B48C guifg=#000000 ctermbg=180 ctermfg=16
+  hi cssColord3d3d3 guibg=#D3D3D3 guifg=#000000 ctermbg=252 ctermfg=16
+  hi cssColord87093 guibg=#D87093 guifg=#000000 ctermbg=168 ctermfg=16
+  hi cssColord8bfd8 guibg=#D8BFD8 guifg=#000000 ctermbg=252 ctermfg=16
+  hi cssColorda70d6 guibg=#DA70D6 guifg=#000000 ctermbg=249 ctermfg=16
+  hi cssColordaa520 guibg=#DAA520 guifg=#000000 ctermbg=3   ctermfg=16
+  hi cssColordc143c guibg=#DC143C guifg=#FFFFFF ctermbg=161 ctermfg=231
+  hi cssColordcdcdc guibg=#DCDCDC guifg=#000000 ctermbg=253 ctermfg=16
+  hi cssColordda0dd guibg=#DDA0DD guifg=#000000 ctermbg=182 ctermfg=16
+  hi cssColordeb887 guibg=#DEB887 guifg=#000000 ctermbg=180 ctermfg=16
+  hi cssColore0ffff guibg=#E0FFFF guifg=#000000 ctermbg=195 ctermfg=16
+  hi cssColore6e6fa guibg=#E6E6FA guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColore9967a guibg=#E9967A guifg=#000000 ctermbg=174 ctermfg=16
+  hi cssColoree82ee guibg=#EE82EE guifg=#000000 ctermbg=251 ctermfg=16
+  hi cssColoreee8aa guibg=#EEE8AA guifg=#000000 ctermbg=223 ctermfg=16
+  hi cssColorf08080 guibg=#F08080 guifg=#000000 ctermbg=210 ctermfg=16
+  hi cssColorf0e68c guibg=#F0E68C guifg=#000000 ctermbg=222 ctermfg=16
+  hi cssColorf0f8ff guibg=#F0F8FF guifg=#000000 ctermbg=15  ctermfg=16
+  hi cssColorf0fff0 guibg=#F0FFF0 guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColorf0ffff guibg=#F0FFFF guifg=#000000 ctermbg=15  ctermfg=16
+  hi cssColorf4a460 guibg=#F4A460 guifg=#000000 ctermbg=215 ctermfg=16
+  hi cssColorf5deb3 guibg=#F5DEB3 guifg=#000000 ctermbg=223 ctermfg=16
+  hi cssColorf5f5dc guibg=#F5F5DC guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColorf5f5f5 guibg=#F5F5F5 guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColorf5fffa guibg=#F5FFFA guifg=#000000 ctermbg=15  ctermfg=16
+  hi cssColorf8f8ff guibg=#F8F8FF guifg=#000000 ctermbg=15  ctermfg=16
+  hi cssColorfa8072 guibg=#FA8072 guifg=#000000 ctermbg=209 ctermfg=16
+  hi cssColorfaebd7 guibg=#FAEBD7 guifg=#000000 ctermbg=7   ctermfg=16
+  hi cssColorfaf0e6 guibg=#FAF0E6 guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColorfafad2 guibg=#FAFAD2 guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColorfdf5e6 guibg=#FDF5E6 guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColorff0000 guibg=#FF0000 guifg=#FFFFFF ctermbg=196 ctermfg=231
+  hi cssColorff00ff guibg=#FF00FF guifg=#FFFFFF ctermbg=13  ctermfg=231
+  hi cssColorff1493 guibg=#FF1493 guifg=#FFFFFF ctermbg=5   ctermfg=231
+  hi cssColorff4500 guibg=#FF4500 guifg=#FFFFFF ctermbg=9   ctermfg=231
+  hi cssColorff6347 guibg=#FF6347 guifg=#000000 ctermbg=203 ctermfg=16
+  hi cssColorff69b4 guibg=#FF69B4 guifg=#000000 ctermbg=205 ctermfg=16
+  hi cssColorff7f50 guibg=#FF7F50 guifg=#000000 ctermbg=209 ctermfg=16
+  hi cssColorff8c00 guibg=#FF8C00 guifg=#000000 ctermbg=3   ctermfg=16
+  hi cssColorffa07a guibg=#FFA07A guifg=#000000 ctermbg=216 ctermfg=16
+  hi cssColorffa500 guibg=#FFA500 guifg=#000000 ctermbg=3   ctermfg=16
+  hi cssColorffb6c1 guibg=#FFB6C1 guifg=#000000 ctermbg=217 ctermfg=16
+  hi cssColorffc0cb guibg=#FFC0CB guifg=#000000 ctermbg=218 ctermfg=16
+  hi cssColorffd700 guibg=#FFD700 guifg=#000000 ctermbg=11  ctermfg=16
+  hi cssColorffdab9 guibg=#FFDAB9 guifg=#000000 ctermbg=223 ctermfg=16
+  hi cssColorffdead guibg=#FFDEAD guifg=#000000 ctermbg=223 ctermfg=16
+  hi cssColorffe4b5 guibg=#FFE4B5 guifg=#000000 ctermbg=223 ctermfg=16
+  hi cssColorffe4c4 guibg=#FFE4C4 guifg=#000000 ctermbg=224 ctermfg=16
+  hi cssColorffe4e1 guibg=#FFE4E1 guifg=#000000 ctermbg=224 ctermfg=16
+  hi cssColorffebcd guibg=#FFEBCD guifg=#000000 ctermbg=7   ctermfg=16
+  hi cssColorffefd5 guibg=#FFEFD5 guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColorfff0f5 guibg=#FFF0F5 guifg=#000000 ctermbg=15  ctermfg=16
+  hi cssColorfff5ee guibg=#FFF5EE guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColorfff8dc guibg=#FFF8DC guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColorfffacd guibg=#FFFACD guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColorfffaf0 guibg=#FFFAF0 guifg=#000000 ctermbg=15  ctermfg=16
+  hi cssColorfffafa guibg=#FFFAFA guifg=#000000 ctermbg=15  ctermfg=16
+  hi cssColorffff00 guibg=#FFFF00 guifg=#000000 ctermbg=11  ctermfg=16
+  hi cssColorffffe0 guibg=#FFFFE0 guifg=#000000 ctermbg=255 ctermfg=16
+  hi cssColorfffff0 guibg=#FFFFF0 guifg=#000000 ctermbg=15  ctermfg=16
+  hi cssColorffffff guibg=#FFFFFF guifg=#000000 ctermbg=231 ctermfg=16
 
   " w3c Colors
-  syn keyword cssColor000000 black   contained
-  syn keyword cssColorc0c0c0 silver  contained
-  syn keyword cssColor808080 gray    contained
-  syn match cssColorffffff "\<white\(-\)\@!\>" contained
-  syn keyword cssColor800000 maroon  contained
-  syn keyword cssColorff0000 red     contained
-  syn keyword cssColor800080 purple  contained
-  syn keyword cssColorff00ff fuchsia contained
-  syn keyword cssColor008000 green   contained
-  syn keyword cssColor00ff00 lime    contained
-  syn keyword cssColor808000 olive   contained
-  syn keyword cssColorffff00 yellow  contained
-  syn keyword cssColor000080 navy    contained
-  syn keyword cssColor0000ff blue    contained
-  syn keyword cssColor008080 teal    contained
-  syn keyword cssColor00ffff aqua    contained
+  syn keyword cssColor000000 black   contained containedin=cssDefinition
+  syn keyword cssColorc0c0c0 silver  contained containedin=cssDefinition
+  syn keyword cssColor808080 gray    contained containedin=cssDefinition
+  syn match cssColorffffff "\<white\(-\)\@!\>" contained containedin=cssDefinition
+  syn keyword cssColor800000 maroon  contained containedin=cssDefinition
+  syn keyword cssColorff0000 red     contained containedin=cssDefinition
+  syn keyword cssColor800080 purple  contained containedin=cssDefinition
+  syn keyword cssColorff00ff fuchsia contained containedin=cssDefinition
+  syn keyword cssColor008000 green   contained containedin=cssDefinition
+  syn keyword cssColor00ff00 lime    contained containedin=cssDefinition
+  syn keyword cssColor808000 olive   contained containedin=cssDefinition
+  syn keyword cssColorffff00 yellow  contained containedin=cssDefinition
+  syn keyword cssColor000080 navy    contained containedin=cssDefinition
+  syn keyword cssColor0000ff blue    contained containedin=cssDefinition
+  syn keyword cssColor008080 teal    contained containedin=cssDefinition
+  syn keyword cssColor00ffff aqua    contained containedin=cssDefinition
 
   " extra colors
-  syn keyword cssColorf0f8ff AliceBlue            contained
-  syn keyword cssColorfaebd7 AntiqueWhite         contained
-  syn keyword cssColor7fffd4 Aquamarine           contained
-  syn keyword cssColorf0ffff Azure                contained
-  syn keyword cssColorf5f5dc Beige                contained
-  syn keyword cssColorffe4c4 Bisque               contained
-  syn keyword cssColorffebcd BlanchedAlmond       contained
-  syn keyword cssColor8a2be2 BlueViolet           contained
-  syn keyword cssColora52a2a Brown                contained
-  syn keyword cssColordeb887 BurlyWood            contained
-  syn keyword cssColor5f9ea0 CadetBlue            contained
-  syn keyword cssColor7fff00 Chartreuse           contained
-  syn keyword cssColord2691e Chocolate            contained
-  syn keyword cssColorff7f50 Coral                contained
-  syn keyword cssColor6495ed CornflowerBlue       contained
-  syn keyword cssColorfff8dc Cornsilk             contained
-  syn keyword cssColordc143c Crimson              contained
-  syn keyword cssColor00ffff Cyan                 contained
-  syn keyword cssColor00008b DarkBlue             contained
-  syn keyword cssColor008b8b DarkCyan             contained
-  syn keyword cssColorb8860b DarkGoldenRod        contained
-  syn keyword cssColora9a9a9 DarkGray             contained
-  syn keyword cssColor006400 DarkGreen            contained
-  syn keyword cssColora9a9a9 DarkGrey             contained
-  syn keyword cssColorbdb76b DarkKhaki            contained
-  syn keyword cssColor8b008b DarkMagenta          contained
-  syn keyword cssColor556b2f DarkOliveGreen       contained
-  syn keyword cssColor9932cc DarkOrchid           contained
-  syn keyword cssColor8b0000 DarkRed              contained
-  syn keyword cssColore9967a DarkSalmon           contained
-  syn keyword cssColor8fbc8f DarkSeaGreen         contained
-  syn keyword cssColor483d8b DarkSlateBlue        contained
-  syn keyword cssColor2f4f4f DarkSlateGray        contained
-  syn keyword cssColor2f4f4f DarkSlateGrey        contained
-  syn keyword cssColor00ced1 DarkTurquoise        contained
-  syn keyword cssColor9400d3 DarkViolet           contained
-  syn keyword cssColorff8c00 Darkorange           contained
-  syn keyword cssColorff1493 DeepPink             contained
-  syn keyword cssColor00bfff DeepSkyBlue          contained
-  syn keyword cssColor696969 DimGray              contained
-  syn keyword cssColor696969 DimGrey              contained
-  syn keyword cssColor1e90ff DodgerBlue           contained
-  syn keyword cssColorb22222 FireBrick            contained
-  syn keyword cssColorfffaf0 FloralWhite          contained
-  syn keyword cssColor228b22 ForestGreen          contained
-  syn keyword cssColordcdcdc Gainsboro            contained
-  syn keyword cssColorf8f8ff GhostWhite           contained
-  syn keyword cssColorffd700 Gold                 contained
-  syn keyword cssColordaa520 GoldenRod            contained
-  syn keyword cssColoradff2f GreenYellow          contained
-  syn keyword cssColor808080 Grey                 contained
-  syn keyword cssColorf0fff0 HoneyDew             contained
-  syn keyword cssColorff69b4 HotPink              contained
-  syn keyword cssColorcd5c5c IndianRed            contained
-  syn keyword cssColor4b0082 Indigo               contained
-  syn keyword cssColorfffff0 Ivory                contained
-  syn keyword cssColorf0e68c Khaki                contained
-  syn keyword cssColore6e6fa Lavender             contained
-  syn keyword cssColorfff0f5 LavenderBlush        contained
-  syn keyword cssColor7cfc00 LawnGreen            contained
-  syn keyword cssColorfffacd LemonChiffon         contained
-  syn keyword cssColoradd8e6 LightBlue            contained
-  syn keyword cssColorf08080 LightCoral           contained
-  syn keyword cssColore0ffff LightCyan            contained
-  syn keyword cssColorfafad2 LightGoldenRodYellow contained
-  syn keyword cssColord3d3d3 LightGray            contained
-  syn keyword cssColor90ee90 LightGreen           contained
-  syn keyword cssColord3d3d3 LightGrey            contained
-  syn keyword cssColorffb6c1 LightPink            contained
-  syn keyword cssColorffa07a LightSalmon          contained
-  syn keyword cssColor20b2aa LightSeaGreen        contained
-  syn keyword cssColor87cefa LightSkyBlue         contained
-  syn keyword cssColor778899 LightSlateGray       contained
-  syn keyword cssColor778899 LightSlateGrey       contained
-  syn keyword cssColorb0c4de LightSteelBlue       contained
-  syn keyword cssColorffffe0 LightYellow          contained
-  syn keyword cssColor32cd32 LimeGreen            contained
-  syn keyword cssColorfaf0e6 Linen                contained
-  syn keyword cssColorff00ff Magenta              contained
-  syn keyword cssColor66cdaa MediumAquaMarine     contained
-  syn keyword cssColor0000cd MediumBlue           contained
-  syn keyword cssColorba55d3 MediumOrchid         contained
-  syn keyword cssColor9370d8 MediumPurple         contained
-  syn keyword cssColor3cb371 MediumSeaGreen       contained
-  syn keyword cssColor7b68ee MediumSlateBlue      contained
-  syn keyword cssColor00fa9a MediumSpringGreen    contained
-  syn keyword cssColor48d1cc MediumTurquoise      contained
-  syn keyword cssColorc71585 MediumVioletRed      contained
-  syn keyword cssColor191970 MidnightBlue         contained
-  syn keyword cssColorf5fffa MintCream            contained
-  syn keyword cssColorffe4e1 MistyRose            contained
-  syn keyword cssColorffe4b5 Moccasin             contained
-  syn keyword cssColorffdead NavajoWhite          contained
-  syn keyword cssColorfdf5e6 OldLace              contained
-  syn keyword cssColor6b8e23 OliveDrab            contained
-  syn keyword cssColorffa500 Orange               contained
-  syn keyword cssColorff4500 OrangeRed            contained
-  syn keyword cssColorda70d6 Orchid               contained
-  syn keyword cssColoreee8aa PaleGoldenRod        contained
-  syn keyword cssColor98fb98 PaleGreen            contained
-  syn keyword cssColorafeeee PaleTurquoise        contained
-  syn keyword cssColord87093 PaleVioletRed        contained
-  syn keyword cssColorffefd5 PapayaWhip           contained
-  syn keyword cssColorffdab9 PeachPuff            contained
-  syn keyword cssColorcd853f Peru                 contained
-  syn keyword cssColorffc0cb Pink                 contained
-  syn keyword cssColordda0dd Plum                 contained
-  syn keyword cssColorb0e0e6 PowderBlue           contained
-  syn keyword cssColorbc8f8f RosyBrown            contained
-  syn keyword cssColor4169e1 RoyalBlue            contained
-  syn keyword cssColor8b4513 SaddleBrown          contained
-  syn keyword cssColorfa8072 Salmon               contained
-  syn keyword cssColorf4a460 SandyBrown           contained
-  syn keyword cssColor2e8b57 SeaGreen             contained
-  syn keyword cssColorfff5ee SeaShell             contained
-  syn keyword cssColora0522d Sienna               contained
-  syn keyword cssColor87ceeb SkyBlue              contained
-  syn keyword cssColor6a5acd SlateBlue            contained
-  syn keyword cssColor708090 SlateGray            contained
-  syn keyword cssColor708090 SlateGrey            contained
-  syn keyword cssColorfffafa Snow                 contained
-  syn keyword cssColor00ff7f SpringGreen          contained
-  syn keyword cssColor4682b4 SteelBlue            contained
-  syn keyword cssColord2b48c Tan                  contained
-  syn keyword cssColord8bfd8 Thistle              contained
-  syn keyword cssColorff6347 Tomato               contained
-  syn keyword cssColor40e0d0 Turquoise            contained
-  syn keyword cssColoree82ee Violet               contained
-  syn keyword cssColorf5deb3 Wheat                contained
-  syn keyword cssColorf5f5f5 WhiteSmoke           contained
-  syn keyword cssColor9acd32 YellowGreen          contained
+  syn keyword cssColorf0f8ff AliceBlue            contained containedin=cssDefinition
+  syn keyword cssColorfaebd7 AntiqueWhite         contained containedin=cssDefinition
+  syn keyword cssColor7fffd4 Aquamarine           contained containedin=cssDefinition
+  syn keyword cssColorf0ffff Azure                contained containedin=cssDefinition
+  syn keyword cssColorf5f5dc Beige                contained containedin=cssDefinition
+  syn keyword cssColorffe4c4 Bisque               contained containedin=cssDefinition
+  syn keyword cssColorffebcd BlanchedAlmond       contained containedin=cssDefinition
+  syn keyword cssColor8a2be2 BlueViolet           contained containedin=cssDefinition
+  syn keyword cssColora52a2a Brown                contained containedin=cssDefinition
+  syn keyword cssColordeb887 BurlyWood            contained containedin=cssDefinition
+  syn keyword cssColor5f9ea0 CadetBlue            contained containedin=cssDefinition
+  syn keyword cssColor7fff00 Chartreuse           contained containedin=cssDefinition
+  syn keyword cssColord2691e Chocolate            contained containedin=cssDefinition
+  syn keyword cssColorff7f50 Coral                contained containedin=cssDefinition
+  syn keyword cssColor6495ed CornflowerBlue       contained containedin=cssDefinition
+  syn keyword cssColorfff8dc Cornsilk             contained containedin=cssDefinition
+  syn keyword cssColordc143c Crimson              contained containedin=cssDefinition
+  syn keyword cssColor00ffff Cyan                 contained containedin=cssDefinition
+  syn keyword cssColor00008b DarkBlue             contained containedin=cssDefinition
+  syn keyword cssColor008b8b DarkCyan             contained containedin=cssDefinition
+  syn keyword cssColorb8860b DarkGoldenRod        contained containedin=cssDefinition
+  syn keyword cssColora9a9a9 DarkGray             contained containedin=cssDefinition
+  syn keyword cssColor006400 DarkGreen            contained containedin=cssDefinition
+  syn keyword cssColora9a9a9 DarkGrey             contained containedin=cssDefinition
+  syn keyword cssColorbdb76b DarkKhaki            contained containedin=cssDefinition
+  syn keyword cssColor8b008b DarkMagenta          contained containedin=cssDefinition
+  syn keyword cssColor556b2f DarkOliveGreen       contained containedin=cssDefinition
+  syn keyword cssColor9932cc DarkOrchid           contained containedin=cssDefinition
+  syn keyword cssColor8b0000 DarkRed              contained containedin=cssDefinition
+  syn keyword cssColore9967a DarkSalmon           contained containedin=cssDefinition
+  syn keyword cssColor8fbc8f DarkSeaGreen         contained containedin=cssDefinition
+  syn keyword cssColor483d8b DarkSlateBlue        contained containedin=cssDefinition
+  syn keyword cssColor2f4f4f DarkSlateGray        contained containedin=cssDefinition
+  syn keyword cssColor2f4f4f DarkSlateGrey        contained containedin=cssDefinition
+  syn keyword cssColor00ced1 DarkTurquoise        contained containedin=cssDefinition
+  syn keyword cssColor9400d3 DarkViolet           contained containedin=cssDefinition
+  syn keyword cssColorff8c00 Darkorange           contained containedin=cssDefinition
+  syn keyword cssColorff1493 DeepPink             contained containedin=cssDefinition
+  syn keyword cssColor00bfff DeepSkyBlue          contained containedin=cssDefinition
+  syn keyword cssColor696969 DimGray              contained containedin=cssDefinition
+  syn keyword cssColor696969 DimGrey              contained containedin=cssDefinition
+  syn keyword cssColor1e90ff DodgerBlue           contained containedin=cssDefinition
+  syn keyword cssColorb22222 FireBrick            contained containedin=cssDefinition
+  syn keyword cssColorfffaf0 FloralWhite          contained containedin=cssDefinition
+  syn keyword cssColor228b22 ForestGreen          contained containedin=cssDefinition
+  syn keyword cssColordcdcdc Gainsboro            contained containedin=cssDefinition
+  syn keyword cssColorf8f8ff GhostWhite           contained containedin=cssDefinition
+  syn keyword cssColorffd700 Gold                 contained containedin=cssDefinition
+  syn keyword cssColordaa520 GoldenRod            contained containedin=cssDefinition
+  syn keyword cssColoradff2f GreenYellow          contained containedin=cssDefinition
+  syn keyword cssColor808080 Grey                 contained containedin=cssDefinition
+  syn keyword cssColorf0fff0 HoneyDew             contained containedin=cssDefinition
+  syn keyword cssColorff69b4 HotPink              contained containedin=cssDefinition
+  syn keyword cssColorcd5c5c IndianRed            contained containedin=cssDefinition
+  syn keyword cssColor4b0082 Indigo               contained containedin=cssDefinition
+  syn keyword cssColorfffff0 Ivory                contained containedin=cssDefinition
+  syn keyword cssColorf0e68c Khaki                contained containedin=cssDefinition
+  syn keyword cssColore6e6fa Lavender             contained containedin=cssDefinition
+  syn keyword cssColorfff0f5 LavenderBlush        contained containedin=cssDefinition
+  syn keyword cssColor7cfc00 LawnGreen            contained containedin=cssDefinition
+  syn keyword cssColorfffacd LemonChiffon         contained containedin=cssDefinition
+  syn keyword cssColoradd8e6 LightBlue            contained containedin=cssDefinition
+  syn keyword cssColorf08080 LightCoral           contained containedin=cssDefinition
+  syn keyword cssColore0ffff LightCyan            contained containedin=cssDefinition
+  syn keyword cssColorfafad2 LightGoldenRodYellow contained containedin=cssDefinition
+  syn keyword cssColord3d3d3 LightGray            contained containedin=cssDefinition
+  syn keyword cssColor90ee90 LightGreen           contained containedin=cssDefinition
+  syn keyword cssColord3d3d3 LightGrey            contained containedin=cssDefinition
+  syn keyword cssColorffb6c1 LightPink            contained containedin=cssDefinition
+  syn keyword cssColorffa07a LightSalmon          contained containedin=cssDefinition
+  syn keyword cssColor20b2aa LightSeaGreen        contained containedin=cssDefinition
+  syn keyword cssColor87cefa LightSkyBlue         contained containedin=cssDefinition
+  syn keyword cssColor778899 LightSlateGray       contained containedin=cssDefinition
+  syn keyword cssColor778899 LightSlateGrey       contained containedin=cssDefinition
+  syn keyword cssColorb0c4de LightSteelBlue       contained containedin=cssDefinition
+  syn keyword cssColorffffe0 LightYellow          contained containedin=cssDefinition
+  syn keyword cssColor32cd32 LimeGreen            contained containedin=cssDefinition
+  syn keyword cssColorfaf0e6 Linen                contained containedin=cssDefinition
+  syn keyword cssColorff00ff Magenta              contained containedin=cssDefinition
+  syn keyword cssColor66cdaa MediumAquaMarine     contained containedin=cssDefinition
+  syn keyword cssColor0000cd MediumBlue           contained containedin=cssDefinition
+  syn keyword cssColorba55d3 MediumOrchid         contained containedin=cssDefinition
+  syn keyword cssColor9370d8 MediumPurple         contained containedin=cssDefinition
+  syn keyword cssColor3cb371 MediumSeaGreen       contained containedin=cssDefinition
+  syn keyword cssColor7b68ee MediumSlateBlue      contained containedin=cssDefinition
+  syn keyword cssColor00fa9a MediumSpringGreen    contained containedin=cssDefinition
+  syn keyword cssColor48d1cc MediumTurquoise      contained containedin=cssDefinition
+  syn keyword cssColorc71585 MediumVioletRed      contained containedin=cssDefinition
+  syn keyword cssColor191970 MidnightBlue         contained containedin=cssDefinition
+  syn keyword cssColorf5fffa MintCream            contained containedin=cssDefinition
+  syn keyword cssColorffe4e1 MistyRose            contained containedin=cssDefinition
+  syn keyword cssColorffe4b5 Moccasin             contained containedin=cssDefinition
+  syn keyword cssColorffdead NavajoWhite          contained containedin=cssDefinition
+  syn keyword cssColorfdf5e6 OldLace              contained containedin=cssDefinition
+  syn keyword cssColor6b8e23 OliveDrab            contained containedin=cssDefinition
+  syn keyword cssColorffa500 Orange               contained containedin=cssDefinition
+  syn keyword cssColorff4500 OrangeRed            contained containedin=cssDefinition
+  syn keyword cssColorda70d6 Orchid               contained containedin=cssDefinition
+  syn keyword cssColoreee8aa PaleGoldenRod        contained containedin=cssDefinition
+  syn keyword cssColor98fb98 PaleGreen            contained containedin=cssDefinition
+  syn keyword cssColorafeeee PaleTurquoise        contained containedin=cssDefinition
+  syn keyword cssColord87093 PaleVioletRed        contained containedin=cssDefinition
+  syn keyword cssColorffefd5 PapayaWhip           contained containedin=cssDefinition
+  syn keyword cssColorffdab9 PeachPuff            contained containedin=cssDefinition
+  syn keyword cssColorcd853f Peru                 contained containedin=cssDefinition
+  syn keyword cssColorffc0cb Pink                 contained containedin=cssDefinition
+  syn keyword cssColordda0dd Plum                 contained containedin=cssDefinition
+  syn keyword cssColorb0e0e6 PowderBlue           contained containedin=cssDefinition
+  syn keyword cssColorbc8f8f RosyBrown            contained containedin=cssDefinition
+  syn keyword cssColor4169e1 RoyalBlue            contained containedin=cssDefinition
+  syn keyword cssColor8b4513 SaddleBrown          contained containedin=cssDefinition
+  syn keyword cssColorfa8072 Salmon               contained containedin=cssDefinition
+  syn keyword cssColorf4a460 SandyBrown           contained containedin=cssDefinition
+  syn keyword cssColor2e8b57 SeaGreen             contained containedin=cssDefinition
+  syn keyword cssColorfff5ee SeaShell             contained containedin=cssDefinition
+  syn keyword cssColora0522d Sienna               contained containedin=cssDefinition
+  syn keyword cssColor87ceeb SkyBlue              contained containedin=cssDefinition
+  syn keyword cssColor6a5acd SlateBlue            contained containedin=cssDefinition
+  syn keyword cssColor708090 SlateGray            contained containedin=cssDefinition
+  syn keyword cssColor708090 SlateGrey            contained containedin=cssDefinition
+  syn keyword cssColorfffafa Snow                 contained containedin=cssDefinition
+  syn keyword cssColor00ff7f SpringGreen          contained containedin=cssDefinition
+  syn keyword cssColor4682b4 SteelBlue            contained containedin=cssDefinition
+  syn keyword cssColord2b48c Tan                  contained containedin=cssDefinition
+  syn keyword cssColord8bfd8 Thistle              contained containedin=cssDefinition
+  syn keyword cssColorff6347 Tomato               contained containedin=cssDefinition
+  syn keyword cssColor40e0d0 Turquoise            contained containedin=cssDefinition
+  syn keyword cssColoree82ee Violet               contained containedin=cssDefinition
+  syn keyword cssColorf5deb3 Wheat                contained containedin=cssDefinition
+  syn keyword cssColorf5f5f5 WhiteSmoke           contained containedin=cssDefinition
+  syn keyword cssColor9acd32 YellowGreen          contained containedin=cssDefinition
 
   let view = winsaveview()
   %call s:PreviewCSSColorInLine()
