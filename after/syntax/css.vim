@@ -153,7 +153,7 @@ hi cssColorffffe0 guibg=#FFFFE0 guifg=#000000 ctermbg=255 ctermfg=16
 hi cssColorfffff0 guibg=#FFFFF0 guifg=#000000 ctermbg=15  ctermfg=16
 hi cssColorffffff guibg=#FFFFFF guifg=#000000 ctermbg=231 ctermfg=16
 
-syn cluster cssColorableGroup contains=cssMediaBlock,cssFunction,cssDefinition,cssAttrRegion
+syn cluster cssColorableGroup contains=cssMediaBlock,cssFunction,cssDefinition,cssAttrRegion,cssComment
 
 " W3C Colors
 syn keyword cssColor000000 black   contained containedin=@cssColorableGroup
