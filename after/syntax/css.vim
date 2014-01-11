@@ -19,8 +19,7 @@ for i in range(0, 255)
   let s:hex[ printf( '%02x', i ) ] = i
 endfor
 
-let s:black = '#000000'
-let s:white = '#ffffff'
+let [s:black, s:white] = has('gui_running') ? ['#000000', '#ffffff'] : [0, 15]
 
 function! s:FGForBG(color)
   " pick suitable text color given a background color
@@ -32,8 +31,8 @@ function! s:FGForBG(color)
 endfunction
 
 let b:color_pattern = {}
-let s:color_prefix  = 'gui'
-let s:fg_color_calc = 'let color = "#" . toupper(a:color)'
+let s:color_prefix  = has('gui_running') ? 'gui' : 'cterm'
+let s:fg_color_calc = has('gui_running') ? '"#" . toupper(a:color)' : 's:XTermColorForRGB(a:color)'
 
 function! s:MatchColorValue(color, pattern)
   if ! len(a:color) | return | endif
@@ -47,7 +46,7 @@ function! s:MatchColorValue(color, pattern)
 
   let group = 'cssColor' . tolower(a:color)
   exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
-  exe s:fg_color_calc
+  exe 'let color =' s:fg_color_calc
   exe 'hi' group s:color_prefix.'bg='.color s:color_prefix.'fg='.s:FGForBG(a:color)
   return ''
 endfunction
@@ -94,12 +93,6 @@ function! s:PreviewCSSColorInLine()
 endfunction
 
 if ! has('gui_running')
-
-  let s:black = 0
-  let s:white = 15
-
-  let s:color_prefix  = 'cterm'
-  let s:fg_color_calc = 'let color = s:XTermColorForRGB(a:color)'
 
   " preset 16 vt100 colors
   let s:xtermcolor = [
