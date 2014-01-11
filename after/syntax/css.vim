@@ -34,7 +34,7 @@ let b:color_pattern = {}
 let s:color_prefix  = has('gui_running') ? 'gui' : 'cterm'
 let s:fg_color_calc = has('gui_running') ? '"#" . toupper(a:color)' : 's:XTermColorForRGB(a:color)'
 
-function! s:MatchColorValue(color, pattern)
+function! s:CreateSynMatch(color, pattern)
   if ! len(a:color) | return | endif
 
   if has_key( b:color_pattern, a:pattern ) | return | endif
@@ -80,14 +80,14 @@ endfunction
 
 function! s:ParseScreen()
   " N.B. these substitute() calls are here just for the side effect
-  "      of invoking s:MatchColorValue during substitution -- because
+  "      of invoking s:CreateSynMatch during substitution -- because
   "      match() and friends do not allow finding all matches in a single
   "      scan without examining the start of the string over and over
   call substitute( substitute( substitute( substitute( join( getline('w0','w$'), "\n" ),
-    \ '#\(\x\)\(\x\)\(\x\)\>', '\=s:MatchColorValue(submatch(1).submatch(1).submatch(2).submatch(2).submatch(3).submatch(3), submatch(0))', 'g' ),
-    \ '#\(\x\{6}\)\>', '\=s:MatchColorValue(submatch(1), submatch(0))', 'g' ),
-    \ 'rgba\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:MatchColorValue(s:HexForRGBValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' ),
-    \ 'hsla\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:MatchColorValue(s:HexForHSLValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
+    \ '#\(\x\)\(\x\)\(\x\)\>', '\=s:CreateSynMatch(submatch(1).submatch(1).submatch(2).submatch(2).submatch(3).submatch(3), submatch(0))', 'g' ),
+    \ '#\(\x\{6}\)\>', '\=s:CreateSynMatch(submatch(1), submatch(0))', 'g' ),
+    \ 'rgba\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:HexForRGBValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' ),
+    \ 'hsla\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:HexForHSLValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
 endfunction
 
 if ! has('gui_running')
