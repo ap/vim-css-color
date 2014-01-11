@@ -14,176 +14,6 @@ endif
 
 if !( has('gui_running') || &t_Co==256 ) | finish | endif
 
-function! s:RGB2Color(r,g,b)
-  " Convert 80% -> 204, 100% -> 255, etc.
-  let rgb = map( [a:r,a:g,a:b], 'v:val =~ "%$" ? ( 255 * v:val ) / 100 : v:val' )
-  return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
-endfunction
-
-function! s:HSL2Color(h,s,l)
-  " Convert 80% -> 0.8, 100% -> 1.0, etc.
-  let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : str2float(v:val)' )
-  " algorithm transcoded to vim from http://www.w3.org/TR/css3-color/#hsl-color
-  let hh = ( a:h % 360 ) / 360.0
-  let m2 = l <= 0.5 ? l * ( s + 1 ) : l + s - l * s
-  let m1 = l * 2 - m2
-  let rgb = []
-  for h in [ hh + (1/3.0), hh, hh - (1/3.0) ]
-    let h = h < 0 ? h + 1 : h > 1 ? h - 1 : h
-    let v =
-          \ h * 6 < 1 ? m1 + ( m2 - m1 ) * h * 6 :
-          \ h * 2 < 1 ? m2 :
-          \ h * 3 < 2 ? m1 + ( m2 - m1 ) * ( 2/3.0 - h ) * 6 :
-          \ m1
-    if v > 1.0 | return '' | endif
-    let rgb += [ float2nr( 255 * v ) ]
-  endfor
-  return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
-endfunction
-
-let s:hex={}
-for i in range(0, 255)
-  let s:hex[ printf( '%02x', i ) ] = i
-endfor
-
-let [s:black, s:white] = has('gui_running') ? ['#000000', '#ffffff'] : [0, 15]
-
-function! s:FGForBG(color)
-  " pick suitable text color given a background color
-  let color = tolower(a:color)
-  let r = s:hex[color[0:1]]
-  let g = s:hex[color[2:3]]
-  let b = s:hex[color[4:5]]
-  return r*30 + g*59 + b*11 > 12000 ? s:black : s:white
-endfunction
-
-let b:color_pattern = {}
-let s:color_prefix  = has('gui_running') ? 'gui' : 'cterm'
-let s:fg_color_calc = has('gui_running') ? '"#" . toupper(a:color)' : 's:XTermColorForRGB(a:color)'
-
-function! s:CreateSynMatch(color, pattern)
-  if ! len(a:color) | return | endif
-
-  if has_key( b:color_pattern, a:pattern ) | return | endif
-  let b:color_pattern[a:pattern] = 1
-
-  let pattern = a:pattern
-  " iff pattern ends on word character, require word break to match
-  if pattern =~ '\>$' | let pattern .= '\>' | endif
-
-  let group = 'cssColor' . tolower(a:color)
-  exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
-  exe 'let color =' s:fg_color_calc
-  exe 'hi' group s:color_prefix.'bg='.color s:color_prefix.'fg='.s:FGForBG(a:color)
-  return ''
-endfunction
-
-function! s:ParseScreen()
-  " N.B. these substitute() calls are here just for the side effect
-  "      of invoking s:CreateSynMatch during substitution -- because
-  "      match() and friends do not allow finding all matches in a single
-  "      scan without examining the start of the string over and over
-  call substitute( substitute( substitute( substitute( join( getline('w0','w$'), "\n" ),
-    \ '#\(\x\)\(\x\)\(\x\)\>', '\=s:CreateSynMatch(submatch(1).submatch(1).submatch(2).submatch(2).submatch(3).submatch(3), submatch(0))', 'g' ),
-    \ '#\(\x\{6}\)\>', '\=s:CreateSynMatch(submatch(1), submatch(0))', 'g' ),
-    \ 'rgba\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:RGB2Color(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' ),
-    \ 'hsla\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:HSL2Color(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
-endfunction
-
-if ! has('gui_running')
-
-  " preset 16 vt100 colors
-  let s:xtermcolor = [
-    \ [ 0x00, 0x00, 0x00,  0 ],
-    \ [ 0xCD, 0x00, 0x00,  1 ],
-    \ [ 0x00, 0xCD, 0x00,  2 ],
-    \ [ 0xCD, 0xCD, 0x00,  3 ],
-    \ [ 0x00, 0x00, 0xEE,  4 ],
-    \ [ 0xCD, 0x00, 0xCD,  5 ],
-    \ [ 0x00, 0xCD, 0xCD,  6 ],
-    \ [ 0xE5, 0xE5, 0xE5,  7 ],
-    \ [ 0x7F, 0x7F, 0x7F,  8 ],
-    \ [ 0xFF, 0x00, 0x00,  9 ],
-    \ [ 0x00, 0xFF, 0x00, 10 ],
-    \ [ 0xFF, 0xFF, 0x00, 11 ],
-    \ [ 0x5C, 0x5C, 0xFF, 12 ],
-    \ [ 0xFF, 0x00, 0xFF, 13 ],
-    \ [ 0x00, 0xFF, 0xFF, 14 ],
-    \ [ 0xFF, 0xFF, 0xFF, 15 ]]
-  " grayscale ramp
-  " (value is 8+10*lum for lum in 0..23)
-  let s:xtermcolor += [
-    \ [ 0x08, 0x08, 0x08, 232 ],
-    \ [ 0x12, 0x12, 0x12, 233 ],
-    \ [ 0x1C, 0x1C, 0x1C, 234 ],
-    \ [ 0x26, 0x26, 0x26, 235 ],
-    \ [ 0x30, 0x30, 0x30, 236 ],
-    \ [ 0x3A, 0x3A, 0x3A, 237 ],
-    \ [ 0x44, 0x44, 0x44, 238 ],
-    \ [ 0x4E, 0x4E, 0x4E, 239 ],
-    \ [ 0x58, 0x58, 0x58, 240 ],
-    \ [ 0x62, 0x62, 0x62, 241 ],
-    \ [ 0x6C, 0x6C, 0x6C, 242 ],
-    \ [ 0x76, 0x76, 0x76, 243 ],
-    \ [ 0x80, 0x80, 0x80, 244 ],
-    \ [ 0x8A, 0x8A, 0x8A, 245 ],
-    \ [ 0x94, 0x94, 0x94, 246 ],
-    \ [ 0x9E, 0x9E, 0x9E, 247 ],
-    \ [ 0xA8, 0xA8, 0xA8, 248 ],
-    \ [ 0xB2, 0xB2, 0xB2, 249 ],
-    \ [ 0xBC, 0xBC, 0xBC, 250 ],
-    \ [ 0xC6, 0xC6, 0xC6, 251 ],
-    \ [ 0xD0, 0xD0, 0xD0, 252 ],
-    \ [ 0xDA, 0xDA, 0xDA, 253 ],
-    \ [ 0xE4, 0xE4, 0xE4, 254 ],
-    \ [ 0xEE, 0xEE, 0xEE, 255 ]]
-
-  " the 6 values used in the xterm color cube
-  "                    0    95   135   175   215   255
-  let s:cubergb = [ 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF ]
-
-  " 0..255 mapped to 0..5 based on the color cube values
-  let s:xvquant = repeat([0],48)
-      \         + repeat([1],68)
-      \         + repeat([2],40)
-      \         + repeat([3],40)
-      \         + repeat([4],40)
-      \         + repeat([5],20)
-  " tweak the mapping for the exact matches (0 and 1 already correct)
-  let s:xvquant[s:cubergb[2]] = 2
-  let s:xvquant[s:cubergb[3]] = 3
-  let s:xvquant[s:cubergb[4]] = 4
-  let s:xvquant[s:cubergb[5]] = 5
-
-  " selects the nearest xterm color for a rgb value like #FF0000
-  function! s:XTermColorForRGB(color)
-    let best_match=0
-    let smallest_distance = 10000000000
-    let color = tolower(a:color)
-    let r = s:hex[color[0:1]]
-    let g = s:hex[color[2:3]]
-    let b = s:hex[color[4:5]]
-
-    let vr = s:xvquant[r]
-    let vg = s:xvquant[g]
-    let vb = s:xvquant[b]
-    let cidx = vr * 36 + vg * 6 + vb + 16
-    let ccol = [ s:cubergb[vr], s:cubergb[vg], s:cubergb[vb], cidx ]
-
-    for [tr,tg,tb,idx] in [ ccol ] + s:xtermcolor
-      let dr = tr - r
-      let dg = tg - g
-      let db = tb - b
-      let distance = dr*dr + dg*dg + db*db
-      if distance == 0 | return idx | endif
-      if distance > smallest_distance | continue | endif
-      let smallest_distance = distance
-      let best_match = idx
-    endfor
-    return best_match
-  endfunction
-endif
-
 hi cssColor000000 guibg=#000000 guifg=#FFFFFF ctermbg=16  ctermfg=231
 hi cssColor000080 guibg=#000080 guifg=#FFFFFF ctermbg=235 ctermfg=231
 hi cssColor00008b guibg=#00008B guifg=#FFFFFF ctermbg=4   ctermfg=231
@@ -325,7 +155,7 @@ hi cssColorffffff guibg=#FFFFFF guifg=#000000 ctermbg=231 ctermfg=16
 
 syn cluster cssColorableGroup contains=cssMediaBlock,cssFunction,cssDefinition,cssAttrRegion
 
-" w3c Colors
+" W3C Colors
 syn keyword cssColor000000 black   contained containedin=@cssColorableGroup
 syn keyword cssColorc0c0c0 silver  contained containedin=@cssColorableGroup
 syn keyword cssColor808080 gray    contained containedin=@cssColorableGroup
@@ -475,6 +305,174 @@ syn keyword cssColoree82ee Violet               contained containedin=@cssColora
 syn keyword cssColorf5deb3 Wheat                contained containedin=@cssColorableGroup
 syn keyword cssColorf5f5f5 WhiteSmoke           contained containedin=@cssColorableGroup
 syn keyword cssColor9acd32 YellowGreen          contained containedin=@cssColorableGroup
+
+function! s:RGB2Color(r,g,b)
+  " Convert 80% -> 204, 100% -> 255, etc.
+  let rgb = map( [a:r,a:g,a:b], 'v:val =~ "%$" ? ( 255 * v:val ) / 100 : v:val' )
+  return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
+endfunction
+
+function! s:HSL2Color(h,s,l)
+  " Convert 80% -> 0.8, 100% -> 1.0, etc.
+  let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : str2float(v:val)' )
+  " algorithm transcoded to vim from http://www.w3.org/TR/css3-color/#hsl-color
+  let hh = ( a:h % 360 ) / 360.0
+  let m2 = l <= 0.5 ? l * ( s + 1 ) : l + s - l * s
+  let m1 = l * 2 - m2
+  let rgb = []
+  for h in [ hh + (1/3.0), hh, hh - (1/3.0) ]
+    let h = h < 0 ? h + 1 : h > 1 ? h - 1 : h
+    let v =
+          \ h * 6 < 1 ? m1 + ( m2 - m1 ) * h * 6 :
+          \ h * 2 < 1 ? m2 :
+          \ h * 3 < 2 ? m1 + ( m2 - m1 ) * ( 2/3.0 - h ) * 6 :
+          \ m1
+    if v > 1.0 | return '' | endif
+    let rgb += [ float2nr( 255 * v ) ]
+  endfor
+  return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
+endfunction
+
+let s:hex={}
+for i in range(0, 255)
+  let s:hex[ printf( '%02x', i ) ] = i
+endfor
+
+if ! has('gui_running')
+
+  " preset 16 vt100 colors
+  let s:xtermcolor = [
+    \ [ 0x00, 0x00, 0x00,  0 ],
+    \ [ 0xCD, 0x00, 0x00,  1 ],
+    \ [ 0x00, 0xCD, 0x00,  2 ],
+    \ [ 0xCD, 0xCD, 0x00,  3 ],
+    \ [ 0x00, 0x00, 0xEE,  4 ],
+    \ [ 0xCD, 0x00, 0xCD,  5 ],
+    \ [ 0x00, 0xCD, 0xCD,  6 ],
+    \ [ 0xE5, 0xE5, 0xE5,  7 ],
+    \ [ 0x7F, 0x7F, 0x7F,  8 ],
+    \ [ 0xFF, 0x00, 0x00,  9 ],
+    \ [ 0x00, 0xFF, 0x00, 10 ],
+    \ [ 0xFF, 0xFF, 0x00, 11 ],
+    \ [ 0x5C, 0x5C, 0xFF, 12 ],
+    \ [ 0xFF, 0x00, 0xFF, 13 ],
+    \ [ 0x00, 0xFF, 0xFF, 14 ],
+    \ [ 0xFF, 0xFF, 0xFF, 15 ]]
+  " grayscale ramp
+  " (value is 8+10*lum for lum in 0..23)
+  let s:xtermcolor += [
+    \ [ 0x08, 0x08, 0x08, 232 ],
+    \ [ 0x12, 0x12, 0x12, 233 ],
+    \ [ 0x1C, 0x1C, 0x1C, 234 ],
+    \ [ 0x26, 0x26, 0x26, 235 ],
+    \ [ 0x30, 0x30, 0x30, 236 ],
+    \ [ 0x3A, 0x3A, 0x3A, 237 ],
+    \ [ 0x44, 0x44, 0x44, 238 ],
+    \ [ 0x4E, 0x4E, 0x4E, 239 ],
+    \ [ 0x58, 0x58, 0x58, 240 ],
+    \ [ 0x62, 0x62, 0x62, 241 ],
+    \ [ 0x6C, 0x6C, 0x6C, 242 ],
+    \ [ 0x76, 0x76, 0x76, 243 ],
+    \ [ 0x80, 0x80, 0x80, 244 ],
+    \ [ 0x8A, 0x8A, 0x8A, 245 ],
+    \ [ 0x94, 0x94, 0x94, 246 ],
+    \ [ 0x9E, 0x9E, 0x9E, 247 ],
+    \ [ 0xA8, 0xA8, 0xA8, 248 ],
+    \ [ 0xB2, 0xB2, 0xB2, 249 ],
+    \ [ 0xBC, 0xBC, 0xBC, 250 ],
+    \ [ 0xC6, 0xC6, 0xC6, 251 ],
+    \ [ 0xD0, 0xD0, 0xD0, 252 ],
+    \ [ 0xDA, 0xDA, 0xDA, 253 ],
+    \ [ 0xE4, 0xE4, 0xE4, 254 ],
+    \ [ 0xEE, 0xEE, 0xEE, 255 ]]
+
+  " the 6 values used in the xterm color cube
+  "                    0    95   135   175   215   255
+  let s:cubergb = [ 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF ]
+
+  " 0..255 mapped to 0..5 based on the color cube values
+  let s:xvquant = repeat([0],48)
+      \         + repeat([1],68)
+      \         + repeat([2],40)
+      \         + repeat([3],40)
+      \         + repeat([4],40)
+      \         + repeat([5],20)
+  " tweak the mapping for the exact matches (0 and 1 already correct)
+  let s:xvquant[s:cubergb[2]] = 2
+  let s:xvquant[s:cubergb[3]] = 3
+  let s:xvquant[s:cubergb[4]] = 4
+  let s:xvquant[s:cubergb[5]] = 5
+
+  " selects the nearest xterm color for a rgb value like #FF0000
+  function! s:XTermColorForRGB(color)
+    let best_match=0
+    let smallest_distance = 10000000000
+    let color = tolower(a:color)
+    let r = s:hex[color[0:1]]
+    let g = s:hex[color[2:3]]
+    let b = s:hex[color[4:5]]
+
+    let vr = s:xvquant[r]
+    let vg = s:xvquant[g]
+    let vb = s:xvquant[b]
+    let cidx = vr * 36 + vg * 6 + vb + 16
+    let ccol = [ s:cubergb[vr], s:cubergb[vg], s:cubergb[vb], cidx ]
+
+    for [tr,tg,tb,idx] in [ ccol ] + s:xtermcolor
+      let dr = tr - r
+      let dg = tg - g
+      let db = tb - b
+      let distance = dr*dr + dg*dg + db*db
+      if distance == 0 | return idx | endif
+      if distance > smallest_distance | continue | endif
+      let smallest_distance = distance
+      let best_match = idx
+    endfor
+    return best_match
+  endfunction
+endif
+
+let [s:black, s:white] = has('gui_running') ? ['#000000', '#ffffff'] : [0, 15]
+function! s:FGForBG(color)
+  " pick suitable text color given a background color
+  let color = tolower(a:color)
+  let r = s:hex[color[0:1]]
+  let g = s:hex[color[2:3]]
+  let b = s:hex[color[4:5]]
+  return r*30 + g*59 + b*11 > 12000 ? s:black : s:white
+endfunction
+
+let b:color_pattern = {}
+let s:color_prefix  = has('gui_running') ? 'gui' : 'cterm'
+let s:fg_color_calc = has('gui_running') ? '"#" . toupper(a:color)' : 's:XTermColorForRGB(a:color)'
+function! s:CreateSynMatch(color, pattern)
+  if ! len(a:color) | return | endif
+
+  if has_key( b:color_pattern, a:pattern ) | return | endif
+  let b:color_pattern[a:pattern] = 1
+
+  let pattern = a:pattern
+  " iff pattern ends on word character, require word break to match
+  if pattern =~ '\>$' | let pattern .= '\>' | endif
+
+  let group = 'cssColor' . tolower(a:color)
+  exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
+  exe 'let color =' s:fg_color_calc
+  exe 'hi' group s:color_prefix.'bg='.color s:color_prefix.'fg='.s:FGForBG(a:color)
+  return ''
+endfunction
+
+function! s:ParseScreen()
+  " N.B. these substitute() calls are here just for the side effect
+  "      of invoking s:CreateSynMatch during substitution -- because
+  "      match() and friends do not allow finding all matches in a single
+  "      scan without examining the start of the string over and over
+  call substitute( substitute( substitute( substitute( join( getline('w0','w$'), "\n" ),
+    \ '#\(\x\)\(\x\)\(\x\)\>', '\=s:CreateSynMatch(submatch(1).submatch(1).submatch(2).submatch(2).submatch(3).submatch(3), submatch(0))', 'g' ),
+    \ '#\(\x\{6}\)\>', '\=s:CreateSynMatch(submatch(1), submatch(0))', 'g' ),
+    \ 'rgba\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:RGB2Color(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' ),
+    \ 'hsla\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:CreateSynMatch(s:HSL2Color(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' )
+endfunction
 
 call s:ParseScreen()
 autocmd CursorMoved  <buffer> silent call s:ParseScreen()
