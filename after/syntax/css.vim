@@ -491,5 +491,4 @@ function! s:ParseScreen()
 endfunction
 
 call s:ParseScreen()
-autocmd CursorMoved  <buffer> silent call s:ParseScreen()
-autocmd CursorMovedI <buffer> silent call s:ParseScreen()
+autocmd CursorMoved,CursorMovedI <buffer> silent call s:ParseScreen()
