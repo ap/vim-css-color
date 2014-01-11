@@ -78,14 +78,12 @@ function! s:HexForHSLValue(h,s,l)
   return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
 endfunction
 
-function! s:PreviewCSSColorInLine()
-  " TODO use cssColor matchdata
-  "
+function! s:ParseScreen()
   " N.B. these substitute() calls are here just for the side effect
   "      of invoking s:MatchColorValue during substitution -- because
   "      match() and friends do not allow finding all matches in a single
   "      scan without examining the start of the string over and over
-  call substitute( substitute( substitute( substitute( getline('.'),
+  call substitute( substitute( substitute( substitute( join( getline('w0','w$'), "\n" ),
     \ '#\(\x\)\(\x\)\(\x\)\>', '\=s:MatchColorValue(submatch(1).submatch(1).submatch(2).submatch(2).submatch(3).submatch(3), submatch(0))', 'g' ),
     \ '#\(\x\{6}\)\>', '\=s:MatchColorValue(submatch(1), submatch(0))', 'g' ),
     \ 'rgba\?(\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*,\s*\(\d\{1,3}%\?\)\s*\%(,[^)]*\)\?)', '\=s:MatchColorValue(s:HexForRGBValue(submatch(1),submatch(2),submatch(3)),submatch(0))', 'g' ),
@@ -478,9 +476,6 @@ syn keyword cssColorf5deb3 Wheat                contained containedin=@cssColora
 syn keyword cssColorf5f5f5 WhiteSmoke           contained containedin=@cssColorableGroup
 syn keyword cssColor9acd32 YellowGreen          contained containedin=@cssColorableGroup
 
-let view = winsaveview()
-%call s:PreviewCSSColorInLine()
-call winrestview(view)
-
-autocmd CursorMoved  <buffer> silent call s:PreviewCSSColorInLine()
-autocmd CursorMovedI <buffer> silent call s:PreviewCSSColorInLine()
+call s:ParseScreen()
+autocmd CursorMoved  <buffer> silent call s:ParseScreen()
+autocmd CursorMovedI <buffer> silent call s:ParseScreen()
