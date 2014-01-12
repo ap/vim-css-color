@@ -140,20 +140,12 @@ else
 	endfunction
 endif
 
-let [s:black, s:white] = s:is_gui ? ['#000000', '#ffffff'] : [0, 15]
-" picks suitable text color given a background color
-function! s:fg_for_bg(color)
-	" expects a:color already lowercased
-	let r = s:hex[a:color[0:1]]
-	let g = s:hex[a:color[2:3]]
-	let b = s:hex[a:color[4:5]]
-	return r*30 + g*59 + b*11 > 12000 ? s:black : s:white
-endfunction
-
-let s:pattern_color  = {}
-let s:color_fg       = {}
-let s:color_prefix   = s:is_gui ? 'gui' : 'cterm'
-let s:syn_color_calc = s:is_gui ? '"#" . rgb_color' : 's:rgb2xterm(rgb_color)'
+let s:pattern_color = {}
+let s:color_fg      = {}
+let s:color_bg      = {}
+let [s:hi_cmd, s:black, s:white] = s:is_gui
+	\ ? ['hi %s  guibg=#%s   guifg=%s', '#000000', '#ffffff']
+	\ : ['hi %s ctermbg=%s ctermfg=%s', 0, 15]
 function! s:create_syn_match()
 
 	let pattern = submatch(0)
@@ -161,9 +153,11 @@ function! s:create_syn_match()
 	if has_key( b:has_color_syn_match, pattern ) | return | endif
 	let b:has_color_syn_match[pattern] = 1
 
-	if has_key( s:pattern_color, pattern )
-		let rgb_color    = s:pattern_color[pattern]
-		let syn_fg_color = s:color_fg[rgb_color]
+	let rgb_color = get( s:pattern_color, pattern, '' )
+
+	if strlen(rgb_color)
+		let syn_fg = s:color_fg[rgb_color]
+		let syn_bg = s:color_bg[rgb_color]
 	else
 		let funcname = submatch(1)
 		let hexcolor = submatch(5)
@@ -182,9 +176,20 @@ function! s:create_syn_match()
 
 		let s:pattern_color[pattern] = rgb_color
 
-		if ! has_key( s:color_fg, rgb_color )
-			let syn_fg_color = s:fg_for_bg(rgb_color)
-			let s:color_fg[rgb_color] = syn_fg_color
+		" check GUI flag early here to avoid pure-overhead caching
+		let syn_bg = s:is_gui ? rgb_color : get( s:color_bg, rgb_color, '' )
+		if ! strlen(syn_bg)
+			let syn_bg = s:rgb2xterm(rgb_color)
+			let s:color_bg[rgb_color] = syn_bg
+		endif
+
+		let syn_fg = get( s:color_fg, rgb_color, '' )
+		if ! strlen(syn_fg)
+			let r = s:hex[rgb_color[0:1]]
+			let g = s:hex[rgb_color[2:3]]
+			let b = s:hex[rgb_color[4:5]]
+			let syn_fg = r*30 + g*59 + b*11 > 12000 ? s:black : s:white
+			let s:color_fg[rgb_color] = syn_fg
 		endif
 	endif
 
@@ -193,8 +198,7 @@ function! s:create_syn_match()
 
 	let group = 'cssColor' . rgb_color
 	exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
-	exe 'let syn_color =' s:syn_color_calc
-	exe 'hi' group s:color_prefix.'bg='.syn_color s:color_prefix.'fg='.syn_fg_color
+	exe printf(s:hi_cmd, group, syn_bg, syn_fg)
 	return ''
 endfunction
 
