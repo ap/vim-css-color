@@ -3,8 +3,6 @@
 " Last Change:  2014-01-11
 " Licence:      No Warranties. WTFPL. But please tell me!
 " Version:      0.9
-"
-" KNOWN PROBLEMS: compatibility with `cursorline` -- https://github.com/ap/vim-css-color/issues/24
 
 if v:version < 700
 	echoerr printf('Vim 7 is required for css-color (this is only %d.%d)',v:version/100,v:version%100)
