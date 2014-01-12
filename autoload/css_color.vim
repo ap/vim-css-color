@@ -153,6 +153,13 @@ let s:color_prefix   = has('gui_running') ? 'gui' : 'cterm'
 let s:syn_color_calc = has('gui_running') ? '"#" . toupper(rgb_color)' : 's:XTermColorForRGB(rgb_color)'
 function! s:create_syn_match(color, pattern)
 
+	if has_key( b:color_pattern, a:pattern ) | return | endif
+	let b:color_pattern[a:pattern] = 1
+
+	let pattern = a:pattern
+	" iff pattern ends on word character, require word break to match
+	if pattern =~ '\>$' | let pattern .= '\>' | endif
+
 	if strlen(a:color) == 6
 		let rgb_color = a:color
 	elseif strlen(a:color) == 3
@@ -160,13 +167,6 @@ function! s:create_syn_match(color, pattern)
 	else
 		return
 	endif
-
-	if has_key( b:color_pattern, a:pattern ) | return | endif
-	let b:color_pattern[a:pattern] = 1
-
-	let pattern = a:pattern
-	" iff pattern ends on word character, require word break to match
-	if pattern =~ '\>$' | let pattern .= '\>' | endif
 
 	let group = 'cssColor' . tolower(rgb_color)
 	exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
