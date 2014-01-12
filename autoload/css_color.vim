@@ -43,7 +43,10 @@ for i in range(0, 255)
 	let s:hex[ printf( '%02x', i ) ] = i
 endfor
 
-if ! has('gui_running')
+if has('gui_running')
+	let s:is_gui = 1
+else
+	let s:is_gui = 0
 
 	" preset 16 vt100 colors
 	let s:xtermcolor = [
@@ -137,7 +140,7 @@ if ! has('gui_running')
 	endfunction
 endif
 
-let [s:black, s:white] = has('gui_running') ? ['#000000', '#ffffff'] : [0, 15]
+let [s:black, s:white] = s:is_gui ? ['#000000', '#ffffff'] : [0, 15]
 " picks suitable text color given a background color
 function! s:fg_for_bg(color)
 	" expects a:color already lowercased
@@ -149,8 +152,8 @@ endfunction
 
 let s:pattern_color  = {}
 let s:color_fg       = {}
-let s:color_prefix   = has('gui_running') ? 'gui' : 'cterm'
-let s:syn_color_calc = has('gui_running') ? '"#" . rgb_color' : 's:rgb2xterm(rgb_color)'
+let s:color_prefix   = s:is_gui ? 'gui' : 'cterm'
+let s:syn_color_calc = s:is_gui ? '"#" . rgb_color' : 's:rgb2xterm(rgb_color)'
 function! s:create_syn_match()
 
 	let pattern = submatch(0)
