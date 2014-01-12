@@ -150,8 +150,8 @@ function! s:create_syn_match()
 
 	let pattern = submatch(0)
 
-	if has_key( b:has_color_syn_match, pattern ) | return | endif
-	let b:has_color_syn_match[pattern] = 1
+	if has_key( b:has_pattern_syn, pattern ) | return | endif
+	let b:has_pattern_syn[pattern] = 1
 
 	let rgb_color = get( s:pattern_color, pattern, '' )
 
@@ -176,29 +176,36 @@ function! s:create_syn_match()
 
 		let s:pattern_color[pattern] = rgb_color
 
-		" check GUI flag early here to avoid pure-overhead caching
-		let syn_bg = s:is_gui ? rgb_color : get( s:color_bg, rgb_color, '' )
-		if ! strlen(syn_bg)
-			let syn_bg = s:rgb2xterm(rgb_color)
-			let s:color_bg[rgb_color] = syn_bg
-		endif
+		if ! has_key( b:has_color_hi, rgb_color )
+			" check GUI flag early here to avoid pure-overhead caching
+			let syn_bg = s:is_gui ? rgb_color : get( s:color_bg, rgb_color, '' )
+			if ! strlen(syn_bg)
+				let syn_bg = s:rgb2xterm(rgb_color)
+				let s:color_bg[rgb_color] = syn_bg
+			endif
 
-		let syn_fg = get( s:color_fg, rgb_color, '' )
-		if ! strlen(syn_fg)
-			let r = s:hex[rgb_color[0:1]]
-			let g = s:hex[rgb_color[2:3]]
-			let b = s:hex[rgb_color[4:5]]
-			let syn_fg = r*30 + g*59 + b*11 > 12000 ? s:black : s:white
-			let s:color_fg[rgb_color] = syn_fg
+			let syn_fg = get( s:color_fg, rgb_color, '' )
+			if ! strlen(syn_fg)
+				let r = s:hex[rgb_color[0:1]]
+				let g = s:hex[rgb_color[2:3]]
+				let b = s:hex[rgb_color[4:5]]
+				let syn_fg = r*30 + g*59 + b*11 > 12000 ? s:black : s:white
+				let s:color_fg[rgb_color] = syn_fg
+			endif
 		endif
+	endif
+
+	let group = 'cssColor' . rgb_color
+
+	if ! has_key( b:has_color_hi, rgb_color )
+		exe printf( s:hi_cmd, group, syn_bg, syn_fg )
+		let b:has_color_hi[rgb_color] = 1
 	endif
 
 	" iff pattern ends on word character, require word break to match
 	if pattern =~ '\>$' | let pattern .= '\>' | endif
-
-	let group = 'cssColor' . rgb_color
 	exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
-	exe printf(s:hi_cmd, group, syn_bg, syn_fg)
+
 	return ''
 endfunction
 
