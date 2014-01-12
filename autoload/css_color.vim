@@ -111,7 +111,7 @@ if ! has('gui_running')
 	let s:xvquant[s:cubergb[5]] = 5
 
 	" selects the nearest xterm color for a rgb value like #FF0000
-	function! s:XTermColorForRGB(color)
+	function! s:rgb2xterm(color)
 		let best_match=0
 		let smallest_distance = 10000000000
 		let color = tolower(a:color)
@@ -151,7 +151,7 @@ endfunction
 
 let s:pattern_color  = {}
 let s:color_prefix   = has('gui_running') ? 'gui' : 'cterm'
-let s:syn_color_calc = has('gui_running') ? '"#" . rgb_color' : 's:XTermColorForRGB(rgb_color)'
+let s:syn_color_calc = has('gui_running') ? '"#" . rgb_color' : 's:rgb2xterm(rgb_color)'
 function! s:create_syn_match()
 
 	let pattern = submatch(0)
