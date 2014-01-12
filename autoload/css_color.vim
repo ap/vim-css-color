@@ -138,12 +138,12 @@ if ! has('gui_running')
 endif
 
 let [s:black, s:white] = has('gui_running') ? ['#000000', '#ffffff'] : [0, 15]
+" picks suitable text color given a background color
 function! s:fg_for_bg(color)
-	" pick suitable text color given a background color
-	let color = tolower(a:color)
-	let r = s:hex[color[0:1]]
-	let g = s:hex[color[2:3]]
-	let b = s:hex[color[4:5]]
+	" expects a:color already lowercased
+	let r = s:hex[a:color[0:1]]
+	let g = s:hex[a:color[2:3]]
+	let b = s:hex[a:color[4:5]]
 	return r*30 + g*59 + b*11 > 12000 ? s:black : s:white
 endfunction
 
