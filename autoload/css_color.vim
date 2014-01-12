@@ -151,7 +151,7 @@ endfunction
 
 let s:pattern_color  = {}
 let s:color_prefix   = has('gui_running') ? 'gui' : 'cterm'
-let s:syn_color_calc = has('gui_running') ? '"#" . toupper(rgb_color)' : 's:XTermColorForRGB(rgb_color)'
+let s:syn_color_calc = has('gui_running') ? '"#" . rgb_color' : 's:XTermColorForRGB(rgb_color)'
 function! s:create_syn_match()
 
 	let pattern = submatch(0)
@@ -170,9 +170,9 @@ function! s:create_syn_match()
 		elseif funcname == 'hsl'
 			let rgb_color = s:hsl2color(submatch(2),submatch(3),submatch(4))
 		elseif strlen(hexcolor) == 6
-			let rgb_color = hexcolor
+			let rgb_color = tolower(hexcolor)
 		elseif strlen(hexcolor) == 3
-			let rgb_color = substitute(hexcolor, '\(.\)', '\1\1', 'g')
+			let rgb_color = substitute(tolower(hexcolor), '\(.\)', '\1\1', 'g')
 		else
 			throw 'css_color: create_syn_match invoked on bad match data'
 		endif
@@ -183,7 +183,7 @@ function! s:create_syn_match()
 	" iff pattern ends on word character, require word break to match
 	if pattern =~ '\>$' | let pattern .= '\>' | endif
 
-	let group = 'cssColor' . tolower(rgb_color)
+	let group = 'cssColor' . rgb_color
 	exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
 	exe 'let syn_color =' s:syn_color_calc
 	exe 'hi' group s:color_prefix.'bg='.syn_color s:color_prefix.'fg='.s:fg_for_bg(rgb_color)
