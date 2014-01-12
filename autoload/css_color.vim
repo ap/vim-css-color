@@ -149,32 +149,39 @@ function! s:fg_for_bg(color)
 	return r*30 + g*59 + b*11 > 12000 ? s:black : s:white
 endfunction
 
+let s:pattern_color  = {}
 let s:color_prefix   = has('gui_running') ? 'gui' : 'cterm'
 let s:syn_color_calc = has('gui_running') ? '"#" . toupper(rgb_color)' : 's:XTermColorForRGB(rgb_color)'
 function! s:create_syn_match()
 
 	let pattern = submatch(0)
 
-	if has_key( b:color_pattern, pattern ) | return | endif
-	let b:color_pattern[pattern] = 1
+	if has_key( b:has_color_syn_match, pattern ) | return | endif
+	let b:has_color_syn_match[pattern] = 1
+
+	if has_key( s:pattern_color, pattern )
+		let rgb_color = s:pattern_color[pattern]
+	else
+		let funcname = submatch(1)
+		let hexcolor = submatch(5)
+
+		if funcname == 'rgb'
+			let rgb_color = s:rgb2color(submatch(2),submatch(3),submatch(4))
+		elseif funcname == 'hsl'
+			let rgb_color = s:hsl2color(submatch(2),submatch(3),submatch(4))
+		elseif strlen(hexcolor) == 6
+			let rgb_color = hexcolor
+		elseif strlen(hexcolor) == 3
+			let rgb_color = substitute(hexcolor, '\(.\)', '\1\1', 'g')
+		else
+			throw 'css_color: create_syn_match invoked on bad match data'
+		endif
+
+		let s:pattern_color[pattern] = rgb_color
+	endif
 
 	" iff pattern ends on word character, require word break to match
 	if pattern =~ '\>$' | let pattern .= '\>' | endif
-
-	let funcname = submatch(1)
-	let hexcolor = submatch(5)
-
-	if funcname == 'rgb'
-		let rgb_color = s:rgb2color(submatch(2),submatch(3),submatch(4))
-	elseif funcname == 'hsl'
-		let rgb_color = s:hsl2color(submatch(2),submatch(3),submatch(4))
-	elseif strlen(hexcolor) == 6
-		let rgb_color = hexcolor
-	elseif strlen(hexcolor) == 3
-		let rgb_color = substitute(hexcolor, '\(.\)', '\1\1', 'g')
-	else
-		throw 'css_color: create_syn_match invoked on bad match data'
-	endif
 
 	let group = 'cssColor' . tolower(rgb_color)
 	exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
@@ -202,14 +209,14 @@ function! css_color#parse_screen()
 	let group = ''
 	let groupstart = 0
 	let endcol = col('$')
-	call filter(b:color_matches, 'matchdelete(v:val)')
+	call filter(b:color_match_id, 'matchdelete(v:val)')
 	for col in range( 1, endcol )
 		let nextgroup = col < endcol ? synIDattr( synID( lnr, col, 1 ), 'name' ) : ''
 		if group == nextgroup | continue | endif
 		if group =~ '^cssColor\x\{6}$'
 			let regex = '\%'.lnr.'l\%'.groupstart.'c'.repeat( '.', col - groupstart )
 			let match = matchadd( group, regex, -1 )
-			let b:color_matches += [ match ]
+			let b:color_match_id += [ match ]
 		endif
 		let group = nextgroup
 		let groupstart = col

@@ -295,6 +295,6 @@ syn keyword cssColorf5deb3 Wheat                contained containedin=@cssColora
 syn keyword cssColorf5f5f5 WhiteSmoke           contained containedin=@cssColorableGroup
 syn keyword cssColor9acd32 YellowGreen          contained containedin=@cssColorableGroup
 
-let b:color_pattern = {}
-let b:color_matches = []
+let b:has_color_syn_match = {}
+let b:color_match_id      = []
 autocmd CursorMoved,CursorMovedI <buffer> call css_color#parse_screen()
