@@ -19,7 +19,7 @@ endfunction
 
 function! s:hsl2color(h,s,l)
 	" Convert 80% -> 0.8, 100% -> 1.0, etc.
-	let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : str2float(v:val)' )
+	let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : v:val + 0.0' )
 	" algorithm transcoded to vim from http://www.w3.org/TR/css3-color/#hsl-color
 	let hh = ( a:h % 360 ) / 360.0
 	let m2 = l <= 0.5 ? l * ( s + 1 ) : l + s - l * s
