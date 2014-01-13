@@ -298,4 +298,4 @@ syn keyword cssColor9acd32 YellowGreen          contained containedin=@cssColora
 let b:has_color_hi    = {}
 let b:has_pattern_syn = {}
 let b:color_match_id  = []
-autocmd CursorMoved,CursorMovedI <buffer> call css_color#parse_screen()
+autocmd CursorMoved,CursorMovedI <buffer> call css_color#parse_css_screen()
