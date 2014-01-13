@@ -237,11 +237,15 @@ let s:_listsep    = s:_ws_ . ',' . s:_ws_
 let s:_otherargs_ = '\%(,[^)]*\)\?'
 let s:_funcexpr   = s:_funcname . '[(]' . s:_numval . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_ws_ . s:_otherargs_ . '[)]'
 let s:_csscolor   = s:_hexcolor . '\|' . s:_funcexpr
+" N.B. these substitute() calls are here just for the side effect
+"      of invoking s:create_syn_match during substitution -- because
+"      match() and friends do not allow finding all matches in a single
+"      scan without examining the start of the string over and over
 function! css_color#parse_css_screen()
-	" N.B. this substitute() call is here just for the side effect
-	"      of invoking s:create_syn_match during substitution -- because
-	"      match() and friends do not allow finding all matches in a single
-	"      scan without examining the start of the string over and over
 	call substitute( join( getline('w0','w$'), "\n" ), s:_csscolor, '\=s:create_syn_match()', 'g' )
+	call s:update_matches()
+endfunction
+function! css_color#parse_any_screen()
+	call substitute( join( getline('w0','w$'), "\n" ), s:_hexcolor, '\=s:create_syn_match()', 'g' )
 	call s:update_matches()
 endfunction
