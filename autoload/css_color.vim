@@ -209,21 +209,8 @@ function! s:create_syn_match()
 	return ''
 endfunction
 
-let s:_funcname   = '\(rgb\|hsl\)a\?' " submatch 1
-let s:_numval     = '\(\d\{1,3}%\?\)' " submatch 2,3,4
-let s:_ws_        = '\s*'
-let s:_listsep    = s:_ws_ . ',' . s:_ws_
-let s:_otherargs_ = '\%(,[^)]*\)\?'
-let s:_funcexpr   = s:_funcname . '[(]' . s:_numval . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_ws_ . s:_otherargs_ . '[)]'
-let s:_hexcolor   = '#\(\x\{3}\|\x\{6}\)\>' " submatch 5
-let s:_grammar    = s:_funcexpr . '\|' . s:_hexcolor
-function! css_color#parse_screen()
-	" N.B. this substitute() call is here just for the side effect
-	"      of invoking s:create_syn_match during substitution -- because
-	"      match() and friends do not allow finding all matches in a single
-	"      scan without examining the start of the string over and over
-	call substitute( join( getline('w0','w$'), "\n" ), s:_grammar, '\=s:create_syn_match()', 'g' )
-
+function! s:update_matches()
+	" adds matches based that duplicate the highlighted colors on the current line
 	let lnr = line('.')
 	let group = ''
 	let groupstart = 0
@@ -240,4 +227,21 @@ function! css_color#parse_screen()
 		let group = nextgroup
 		let groupstart = col
 	endfor
+endfunction
+
+let s:_funcname   = '\(rgb\|hsl\)a\?' " submatch 1
+let s:_numval     = '\(\d\{1,3}%\?\)' " submatch 2,3,4
+let s:_ws_        = '\s*'
+let s:_listsep    = s:_ws_ . ',' . s:_ws_
+let s:_otherargs_ = '\%(,[^)]*\)\?'
+let s:_funcexpr   = s:_funcname . '[(]' . s:_numval . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_ws_ . s:_otherargs_ . '[)]'
+let s:_hexcolor   = '#\(\x\{3}\|\x\{6}\)\>' " submatch 5
+let s:_grammar    = s:_funcexpr . '\|' . s:_hexcolor
+function! css_color#parse_screen()
+	" N.B. this substitute() call is here just for the side effect
+	"      of invoking s:create_syn_match during substitution -- because
+	"      match() and friends do not allow finding all matches in a single
+	"      scan without examining the start of the string over and over
+	call substitute( join( getline('w0','w$'), "\n" ), s:_grammar, '\=s:create_syn_match()', 'g' )
+	call s:update_matches()
 endfunction
