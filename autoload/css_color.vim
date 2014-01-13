@@ -216,7 +216,7 @@ let s:_listsep    = s:_ws_ . ',' . s:_ws_
 let s:_otherargs_ = '\%(,[^)]*\)\?'
 let s:_funcexpr   = s:_funcname . '[(]' . s:_numval . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_ws_ . s:_otherargs_ . '[)]'
 let s:_hexcolor   = '#\(\x\{3}\|\x\{6}\)\>' " submatch 5
-let s:_grammar    = s:_funcexpr . '\|' . s:_hexcolor . '\zs'
+let s:_grammar    = s:_funcexpr . '\|' . s:_hexcolor
 function! css_color#parse_screen()
 	" N.B. this substitute() call is here just for the side effect
 	"      of invoking s:create_syn_match during substitution -- because
