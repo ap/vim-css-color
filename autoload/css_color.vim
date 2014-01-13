@@ -159,13 +159,13 @@ function! s:create_syn_match()
 		let syn_fg = s:color_fg[rgb_color]
 		let syn_bg = s:color_bg[rgb_color]
 	else
-		let funcname = submatch(1)
-		let hexcolor = submatch(5)
+		let hexcolor = submatch(1)
+		let funcname = submatch(2)
 
 		if funcname == 'rgb'
-			let rgb_color = s:rgb2color(submatch(2),submatch(3),submatch(4))
+			let rgb_color = s:rgb2color(submatch(3),submatch(4),submatch(5))
 		elseif funcname == 'hsl'
-			let rgb_color = s:hsl2color(submatch(2),submatch(3),submatch(4))
+			let rgb_color = s:hsl2color(submatch(3),submatch(4),submatch(5))
 		elseif strlen(hexcolor) == 6
 			let rgb_color = tolower(hexcolor)
 		elseif strlen(hexcolor) == 3
@@ -229,14 +229,14 @@ function! s:update_matches()
 	endfor
 endfunction
 
-let s:_funcname   = '\(rgb\|hsl\)a\?' " submatch 1
-let s:_numval     = '\(\d\{1,3}%\?\)' " submatch 2,3,4
+let s:_hexcolor   = '#\(\x\{3}\|\x\{6}\)\>' " submatch 1
+let s:_funcname   = '\(rgb\|hsl\)a\?' " submatch 2
+let s:_numval     = '\(\d\{1,3}%\?\)' " submatch 3,4,5
 let s:_ws_        = '\s*'
 let s:_listsep    = s:_ws_ . ',' . s:_ws_
 let s:_otherargs_ = '\%(,[^)]*\)\?'
 let s:_funcexpr   = s:_funcname . '[(]' . s:_numval . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_ws_ . s:_otherargs_ . '[)]'
-let s:_hexcolor   = '#\(\x\{3}\|\x\{6}\)\>' " submatch 5
-let s:_grammar    = s:_funcexpr . '\|' . s:_hexcolor
+let s:_grammar    = s:_hexcolor . '\|' . s:_funcexpr
 function! css_color#parse_screen()
 	" N.B. this substitute() call is here just for the side effect
 	"      of invoking s:create_syn_match during substitution -- because
