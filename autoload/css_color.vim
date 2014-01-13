@@ -195,7 +195,7 @@ function! s:create_syn_match()
 		endif
 	endif
 
-	let group = 'cssColor' . rgb_color
+	let group = 'BG' . rgb_color
 
 	if ! has_key( b:has_color_hi, rgb_color )
 		exe printf( s:hi_cmd, group, syn_bg, syn_fg )
@@ -204,7 +204,7 @@ function! s:create_syn_match()
 
 	" iff pattern ends on word character, require word break to match
 	if pattern =~ '\>$' | let pattern .= '\>' | endif
-	exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@cssColorableGroup'
+	exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@colorableGroup'
 
 	return ''
 endfunction
@@ -219,7 +219,7 @@ function! s:update_matches()
 	for col in range( 1, endcol )
 		let nextgroup = col < endcol ? synIDattr( synID( lnr, col, 1 ), 'name' ) : ''
 		if group == nextgroup | continue | endif
-		if group =~ '^cssColor\x\{6}$'
+		if group =~ '^BG\x\{6}$'
 			let regex = '\%'.lnr.'l\%'.groupstart.'c'.repeat( '.', col - groupstart )
 			let match = matchadd( group, regex, -1 )
 			let b:color_match_id += [ match ]
