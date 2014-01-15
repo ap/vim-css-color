@@ -155,10 +155,7 @@ function! s:create_syn_match()
 
 	let rgb_color = get( s:pattern_color, pattern, '' )
 
-	if strlen(rgb_color)
-		let syn_fg = s:color_fg[rgb_color]
-		let syn_bg = s:color_bg[rgb_color]
-	else
+	if ! strlen( rgb_color )
 		let hexcolor = submatch(1)
 		let funcname = submatch(2)
 
@@ -175,23 +172,23 @@ function! s:create_syn_match()
 		endif
 
 		let s:pattern_color[pattern] = rgb_color
+	endif
 
-		if ! has_key( b:has_color_hi, rgb_color )
-			" check GUI flag early here to avoid pure-overhead caching
-			let syn_bg = s:is_gui ? rgb_color : get( s:color_bg, rgb_color, '' )
-			if ! strlen(syn_bg)
-				let syn_bg = s:rgb2xterm(rgb_color)
-				let s:color_bg[rgb_color] = syn_bg
-			endif
+	if ! has_key( b:has_color_hi, rgb_color )
+		" check GUI flag early here to avoid pure-overhead caching
+		let syn_bg = s:is_gui ? rgb_color : get( s:color_bg, rgb_color, '' )
+		if ! strlen(syn_bg)
+			let syn_bg = s:rgb2xterm(rgb_color)
+			let s:color_bg[rgb_color] = syn_bg
+		endif
 
-			let syn_fg = get( s:color_fg, rgb_color, '' )
-			if ! strlen(syn_fg)
-				let r = s:hex[rgb_color[0:1]]
-				let g = s:hex[rgb_color[2:3]]
-				let b = s:hex[rgb_color[4:5]]
-				let syn_fg = r*30 + g*59 + b*11 > 12000 ? s:black : s:white
-				let s:color_fg[rgb_color] = syn_fg
-			endif
+		let syn_fg = get( s:color_fg, rgb_color, '' )
+		if ! strlen(syn_fg)
+			let r = s:hex[rgb_color[0:1]]
+			let g = s:hex[rgb_color[2:3]]
+			let b = s:hex[rgb_color[4:5]]
+			let syn_fg = r*30 + g*59 + b*11 > 12000 ? s:black : s:white
+			let s:color_fg[rgb_color] = syn_fg
 		endif
 	endif
 
