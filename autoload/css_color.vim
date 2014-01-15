@@ -257,6 +257,8 @@ function! css_color#init(type, groups)
 	let b:color_match_id  = []
 	exe 'autocmd CursorMoved,CursorMovedI <buffer> call s:parse_'.a:type.'_screen()'
 
+	exe 'call s:parse_'.a:type.'_screen()'
+
 	if a:type != 'css' | return | endif
 
 	hi BG000000 guibg=#000000 guifg=#FFFFFF ctermbg=16  ctermfg=231
