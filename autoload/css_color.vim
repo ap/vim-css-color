@@ -261,7 +261,7 @@ function! css_color#init(type, groups)
 		exe 'autocmd CursorMoved,CursorMovedI <buffer> call s:parse_'.a:type.'_screen()'
 	augroup END
 
-	exe 'call s:parse_'.a:type.'_screen()'
+	do CSSColor CursorMoved <buffer>
 
 	if a:type != 'css' | return | endif
 
