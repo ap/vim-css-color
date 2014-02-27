@@ -207,23 +207,25 @@ function! s:create_syn_match()
 endfunction
 
 function! s:update_matches()
-	" adds matches based that duplicate the highlighted colors on the current line
-	let lnr = line('.')
-	let group = ''
-	let groupstart = 0
-	let endcol = col('$')
 	call filter(b:color_match_id, 'matchdelete(v:val)')
-	for col in range( 1, endcol )
-		let nextgroup = col < endcol ? synIDattr( synID( lnr, col, 1 ), 'name' ) : ''
-		if group == nextgroup | continue | endif
-		if group =~ '^BG\x\{6}$'
-			let regex = '\%'.lnr.'l\%'.groupstart.'c'.repeat( '.', col - groupstart )
-			let match = matchadd( group, regex, -1 )
-			let b:color_match_id += [ match ]
-		endif
-		let group = nextgroup
-		let groupstart = col
-	endfor
+	if &l:cursorline
+		" adds matches based that duplicate the highlighted colors on the current line
+		let lnr = line('.')
+		let group = ''
+		let groupstart = 0
+		let endcol = col('$')
+		for col in range( 1, endcol )
+			let nextgroup = col < endcol ? synIDattr( synID( lnr, col, 1 ), 'name' ) : ''
+			if group == nextgroup | continue | endif
+			if group =~ '^BG\x\{6}$'
+				let regex = '\%'.lnr.'l\%'.groupstart.'c'.repeat( '.', col - groupstart )
+				let match = matchadd( group, regex, -1 )
+				let b:color_match_id += [ match ]
+			endif
+			let group = nextgroup
+			let groupstart = col
+		endfor
+	endif
 endfunction
 
 let s:_hexcolor   = '#\(\x\{3}\|\x\{6}\)\>' " submatch 1
