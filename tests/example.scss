@@ -13,15 +13,15 @@ dd {
 /*
  * Multi line comment: #123, #456
  */
-
 // Single line comment: #123456
 
-$link-color: #654321;
+$link-color: rgba(144, 0, 0, .5);
+$text-color: hsl(0, 100%, 50%);
 
 ul {
   color: white;
 
   li {
-    color: $link_color;
+    color: black;
   }
 }
