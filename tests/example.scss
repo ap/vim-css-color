@@ -1,0 +1,27 @@
+dl {
+  background: #333;
+}
+
+dt {
+  background: #666;
+}
+
+dd {
+  background: #999;
+}
+
+/*
+ * Multi line comment: #123, #456
+ */
+
+// Single line comment: #123456
+
+$link-color: #654321;
+
+ul {
+  color: white;
+
+  li {
+    color: $link_color;
+  }
+}
