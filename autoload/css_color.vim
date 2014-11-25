@@ -1,7 +1,7 @@
 " Language:     Colorful CSS Color Preview
 " Author:       Aristotle Pagaltzis <pagaltzis@gmx.de>
 " Last Change:  2014-01-14
-" Licence:      No Warranties. WTFPL. But please tell me!
+" Licence:      The MIT License (MIT)
 " Version:      1.0
 
 if v:version < 700
