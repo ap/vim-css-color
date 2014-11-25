@@ -1,8 +1,7 @@
 " Language:     Colorful CSS Color Preview
 " Author:       Aristotle Pagaltzis <pagaltzis@gmx.de>
-" Last Change:  2014-01-14
+" Commit:       $Format:%H$
 " Licence:      The MIT License (MIT)
-" Version:      1.0
 
 if v:version < 700
 	echoerr printf('Vim 7 is required for css-color (this is only %d.%d)',v:version/100,v:version%100)
