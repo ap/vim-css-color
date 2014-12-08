@@ -271,7 +271,7 @@ function! css_color#init(type, groups)
 		autocmd BufWinLeave <buffer> call s:clear_matches()
 	augroup END
 
-	do CSSColor CursorMoved <buffer>
+	exe 'call s:parse_'.a:type.'_screen()'
 
 	if a:type != 'css' | return | endif
 
