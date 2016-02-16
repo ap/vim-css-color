@@ -8,7 +8,7 @@ if v:version < 700
 	finish
 endif
 
-if !( has('gui_running') || &t_Co==256 ) | finish | endif
+if !( has('gui_running') || has('nvim') || &t_Co==256 ) | finish | endif
 
 function! s:rgb2color(r,g,b)
 	" Convert 80% -> 204, 100% -> 255, etc.
