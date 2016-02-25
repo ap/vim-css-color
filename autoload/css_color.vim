@@ -150,7 +150,7 @@ else
 endif
 
 let s:pattern_color = {}
-let s:color_fg      = {}
+let s:color_bright  = {}
 function! s:create_syn_match()
 
 	let pattern = submatch(0)
@@ -180,16 +180,16 @@ function! s:create_syn_match()
 	endif
 
 	if ! has_key( b:has_color_hi, rgb_color )
-		let syn_fg = get( s:color_fg, rgb_color, '' )
-		if ! strlen(syn_fg)
+		let is_bright = get( s:color_bright, rgb_color, -1 )
+		if is_bright == -1
 			let r = s:hex[rgb_color[0:1]]
 			let g = s:hex[rgb_color[2:3]]
 			let b = s:hex[rgb_color[4:5]]
-			let syn_fg = r*30 + g*59 + b*11 > 12000
-			let s:color_fg[rgb_color] = syn_fg
+			let is_bright = r*30 + g*59 + b*11 > 12000
+			let s:color_bright[rgb_color] = is_bright
 		endif
 
-		call s:create_highlight( rgb_color, syn_fg )
+		call s:create_highlight( rgb_color, is_bright )
 		let b:has_color_hi[rgb_color] = 1
 	endif
 
