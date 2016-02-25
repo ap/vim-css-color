@@ -146,6 +146,7 @@ else
 			let s:color_idx[a:color] = color_idx
 		endif
 		exe 'hi BG'.a:color 'ctermbg='.color_idx 'ctermfg='.( a:is_bright ? 0 : 15 )
+		\                    'guibg=#'.a:color    'guifg=#'.( a:is_bright ? '000000' : 'ffffff' )
 	endfunction
 endif
 
