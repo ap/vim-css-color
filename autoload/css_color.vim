@@ -179,8 +179,6 @@ function! s:create_syn_match()
 		let s:pattern_color[pattern] = rgb_color
 	endif
 
-	let group = 'BG' . rgb_color
-
 	if ! has_key( b:has_color_hi, rgb_color )
 		let syn_fg = get( s:color_fg, rgb_color, '' )
 		if ! strlen(syn_fg)
@@ -197,7 +195,7 @@ function! s:create_syn_match()
 
 	" iff pattern ends on word character, require word break to match
 	if pattern =~ '\>$' | let pattern .= '\>' | endif
-	exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@colorableGroup'
+	exe 'syn match BG'.rgb_color.' /'.escape(pattern, '/').'/ contained containedin=@colorableGroup'
 
 	return ''
 endfunction
