@@ -8,7 +8,7 @@ if v:version < 700
 	finish
 endif
 
-if !( has('gui_running') || &t_Co==256 ) | finish | endif
+if !( has('gui_running') || has('nvim') || &t_Co==256 ) | finish | endif
 
 function! s:rgb2color(r,g,b)
 	" Convert 80% -> 204, 100% -> 255, etc.
@@ -43,10 +43,10 @@ for i in range(0, 255)
 endfor
 
 if has('gui_running')
-	let s:is_gui = 1
+	function! s:create_highlight(color, is_bright)
+		exe 'hi BG'.a:color 'guibg=#'.a:color 'guifg=#'.( a:is_bright ? '000000' : 'ffffff' )
+	endfunction
 else
-	let s:is_gui = 0
-
 	" preset 16 vt100 colors
 	let s:xtermcolor = [
 		\ [ 0x00, 0x00, 0x00,  0 ],
@@ -137,14 +137,21 @@ else
 		endfor
 		return best_match
 	endfunction
+
+	let s:color_idx = {}
+	function! s:create_highlight(color, is_bright)
+		let color_idx = get( s:color_idx, a:color, -1 )
+		if color_idx == -1
+			let color_idx = s:rgb2xterm(a:color)
+			let s:color_idx[a:color] = color_idx
+		endif
+		exe 'hi BG'.a:color 'ctermbg='.color_idx 'ctermfg='.( a:is_bright ? 0 : 15 )
+		\                    'guibg=#'.a:color    'guifg=#'.( a:is_bright ? '000000' : 'ffffff' )
+	endfunction
 endif
 
 let s:pattern_color = {}
-let s:color_fg      = {}
-let s:color_bg      = {}
-let [s:hi_cmd, s:black, s:white] = s:is_gui
-	\ ? ['hi %s  guibg=#%s   guifg=%s', '#000000', '#ffffff']
-	\ : ['hi %s ctermbg=%s ctermfg=%s', 0, 15]
+let s:color_bright  = {}
 function! s:create_syn_match()
 
 	let pattern = submatch(0)
@@ -173,32 +180,23 @@ function! s:create_syn_match()
 		let s:pattern_color[pattern] = rgb_color
 	endif
 
-	let group = 'BG' . rgb_color
-
 	if ! has_key( b:has_color_hi, rgb_color )
-		" check GUI flag early here to avoid pure-overhead caching
-		let syn_bg = s:is_gui ? rgb_color : get( s:color_bg, rgb_color, '' )
-		if ! strlen(syn_bg)
-			let syn_bg = s:rgb2xterm(rgb_color)
-			let s:color_bg[rgb_color] = syn_bg
-		endif
-
-		let syn_fg = get( s:color_fg, rgb_color, '' )
-		if ! strlen(syn_fg)
+		let is_bright = get( s:color_bright, rgb_color, -1 )
+		if is_bright == -1
 			let r = s:hex[rgb_color[0:1]]
 			let g = s:hex[rgb_color[2:3]]
 			let b = s:hex[rgb_color[4:5]]
-			let syn_fg = r*30 + g*59 + b*11 > 12000 ? s:black : s:white
-			let s:color_fg[rgb_color] = syn_fg
+			let is_bright = r*30 + g*59 + b*11 > 12000
+			let s:color_bright[rgb_color] = is_bright
 		endif
 
-		exe printf( s:hi_cmd, group, syn_bg, syn_fg )
+		call s:create_highlight( rgb_color, is_bright )
 		let b:has_color_hi[rgb_color] = 1
 	endif
 
 	" iff pattern ends on word character, require word break to match
 	if pattern =~ '\>$' | let pattern .= '\>' | endif
-	exe 'syn match' group '/'.escape(pattern, '/').'/ contained containedin=@colorableGroup'
+	exe 'syn match BG'.rgb_color.' /'.escape(pattern, '/').'/ contained containedin=@colorableGroup'
 
 	return ''
 endfunction
