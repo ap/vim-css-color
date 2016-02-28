@@ -1,8 +1,6 @@
 " Language:     Colorful CSS Color Preview
 " Author:       Aristotle Pagaltzis <pagaltzis@gmx.de>
 
-if !( has('gui_running') || has('nvim') || &t_Co==256 ) | finish | endif
-
 " variable               | property       | multiline      | end-of-line | plugin
 " -----------------------+----------------+----------------+-------------+---------
 "                lessCssAttribute         | lessCssComment | lessComment | https://github.com/genoma/vim-less

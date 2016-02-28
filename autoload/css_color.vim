@@ -3,12 +3,13 @@
 " Commit:       $Format:%H$
 " Licence:      The MIT License (MIT)
 
-if v:version < 700
-	echoerr printf('Vim 7 is required for css-color (this is only %d.%d)',v:version/100,v:version%100)
+if v:version < 700 || !( has('gui_running') || has('nvim') || &t_Co==256 )
+	function! css_color#init(type, keywords, groups)
+	endfunction
+	function! css_color#extend(groups)
+	endfunction
 	finish
 endif
-
-if !( has('gui_running') || has('nvim') || &t_Co==256 ) | finish | endif
 
 function! s:rgb2color(r,g,b)
 	" Convert 80% -> 204, 100% -> 255, etc.
@@ -253,6 +254,10 @@ function! s:parse_hex_screen()
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+function! css_color#extend(groups) " if already initialized (by other filetype)
+	exe 'syn cluster colorableGroup add=' . a:groups
+endfunction
 
 function! css_color#init(type, keywords, groups)
 	exe 'syn cluster colorableGroup contains=' . a:groups
