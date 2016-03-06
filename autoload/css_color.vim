@@ -274,7 +274,7 @@ function! css_color#init(type, keywords, groups)
 
 	exe 'call s:parse_'.a:type.'_screen()'
 
-	if a:keywords == 'none' | return | endif
+	if a:keywords == 'none' || g:css_color_keywords == 'none' | return | endif
 
 	syn case ignore
 
@@ -314,7 +314,7 @@ function! css_color#init(type, keywords, groups)
 	syn keyword BG008080 teal    contained containedin=@colorableGroup
 	syn keyword BG00ffff aqua    contained containedin=@colorableGroup
 
-	if a:keywords == 'basic' | return | endif
+	if a:keywords == 'basic' || g:css_color_keywords == 'basic' | return | endif
 
 	" W3C extended colors
 
