@@ -242,14 +242,9 @@ let s:_csscolor   = s:_hexcolor . '\|' . s:_funcexpr
 "      of invoking s:create_syn_match during substitution -- because
 "      match() and friends do not allow finding all matches in a single
 "      scan without examining the start of the string over and over
-function! s:parse_css_screen()
-	call substitute( join( getline('w0','w$'), "\n" ), s:_csscolor, '\=s:create_syn_match()', 'g' )
+function! s:parse_screen()
 	call s:clear_matches()
-	call s:create_matches()
-endfunction
-function! s:parse_hex_screen()
-	call substitute( join( getline('w0','w$'), "\n" ), s:_hexcolor, '\=s:create_syn_match()', 'g' )
-	call s:clear_matches()
+	call substitute( join( getline('w0','w$'), "\n" ), b:pattern, '\=s:create_syn_match()', 'g' )
 	call s:create_matches()
 endfunction
 
@@ -262,17 +257,18 @@ endfunction
 function! css_color#init(type, keywords, groups)
 	exe 'syn cluster colorableGroup contains=' . a:groups
 
+	let b:pattern         = a:type == 'css' ? s:_csscolor : a:type == 'hex' ? s:_hexcolor : '$^'
 	let b:has_color_hi    = {}
 	let b:has_pattern_syn = {}
 
 	augroup CSSColor
 		autocmd! * <buffer>
-		exe 'autocmd CursorMoved,CursorMovedI <buffer> call s:parse_'.a:type.'_screen()'
-		autocmd BufWinEnter <buffer> call s:create_matches()
-		autocmd BufWinLeave <buffer> call s:clear_matches()
+		autocmd BufWinEnter              <buffer> call s:create_matches()
+		autocmd CursorMoved,CursorMovedI <buffer> call s:parse_screen()
+		autocmd BufWinLeave              <buffer> call s:clear_matches()
 	augroup END
 
-	exe 'call s:parse_'.a:type.'_screen()'
+	call s:parse_screen()
 
 	if a:keywords == 'none' | return | endif
 
