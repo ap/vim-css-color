@@ -157,8 +157,8 @@ function! s:create_syn_match()
 
 	let pattern = submatch(0)
 
-	if has_key( b:has_pattern_syn, pattern ) | return | endif
-	let b:has_pattern_syn[pattern] = 1
+	if has_key( b:css_color_syn, pattern ) | return | endif
+	let b:css_color_syn[pattern] = 1
 
 	let rgb_color = get( s:pattern_color, pattern, '' )
 
@@ -181,7 +181,7 @@ function! s:create_syn_match()
 		let s:pattern_color[pattern] = rgb_color
 	endif
 
-	if ! has_key( b:has_color_hi, rgb_color )
+	if ! has_key( b:css_color_hi, rgb_color )
 		let is_bright = get( s:color_bright, rgb_color, -1 )
 		if is_bright == -1
 			let r = s:hex[rgb_color[0:1]]
@@ -192,7 +192,7 @@ function! s:create_syn_match()
 		endif
 
 		call s:create_highlight( rgb_color, is_bright )
-		let b:has_color_hi[rgb_color] = 1
+		let b:css_color_hi[rgb_color] = 1
 	endif
 
 	" iff pattern ends on word character, require word break to match
@@ -244,7 +244,7 @@ let s:_csscolor   = s:_hexcolor . '\|' . s:_funcexpr
 "      scan without examining the start of the string over and over
 function! s:parse_screen()
 	call s:clear_matches()
-	call substitute( join( getline('w0','w$'), "\n" ), b:pattern, '\=s:create_syn_match()', 'g' )
+	call substitute( join( getline('w0','w$'), "\n" ), b:css_color_pat, '\=s:create_syn_match()', 'g' )
 	call s:create_matches()
 endfunction
 
@@ -257,9 +257,9 @@ endfunction
 function! css_color#init(type, keywords, groups)
 	exe 'syn cluster colorableGroup contains=' . a:groups
 
-	let b:pattern         = a:type == 'css' ? s:_csscolor : a:type == 'hex' ? s:_hexcolor : '$^'
-	let b:has_color_hi    = {}
-	let b:has_pattern_syn = {}
+	let b:css_color_pat = a:type == 'css' ? s:_csscolor : a:type == 'hex' ? s:_hexcolor : '$^'
+	let b:css_color_hi  = {}
+	let b:css_color_syn = {}
 
 	augroup CSSColor
 		autocmd! * <buffer>
