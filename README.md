@@ -1,10 +1,8 @@
 <img src="http://ap.github.io/vim-css-color/screenshot.png" alt=""/>
 
-A very fast fork of [Niklas Hofer’s `css_color.vim`](http://www.vim.org/scripts/script.php?script_id=2150), with extra features:
+A very fast color keyword highlighter for Vim with context-sensitive support
+for many language syntaxes.
 
-* multiple color highlights per line
-* `rgb()`, `rgba()`, [`hsl()`](http://www.w3.org/TR/css3-color/#hsl-color) support for CSS
-* support for various alternative CSS languages like Less and Sass
-* support for various non-CSS languages like VimL and Lua
-
-Inspired by [Max Vasiliev’s fork](https://github.com/skammer/vim-css-color).
+<sub>Originally based on code
+by  [Niklas Hofer](http://www.vim.org/scripts/script.php?script_id=2150)
+and [Max Vasiliev](https://github.com/skammer/vim-css-color).</sub>
