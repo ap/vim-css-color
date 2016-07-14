@@ -250,6 +250,11 @@ endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+function! css_color#reinit()
+	let [type, keywords, groups] = b:css_color_arg
+	call css_color#init(type, keywords, groups)
+endfunction
+
 function! css_color#extend(groups) " if already initialized (by other filetype)
 	exe 'syn cluster colorableGroup add=' . a:groups
 endfunction
@@ -257,12 +262,14 @@ endfunction
 function! css_color#init(type, keywords, groups)
 	exe 'syn cluster colorableGroup contains=' . a:groups
 
+	let b:css_color_arg = [a:type, a:keywords, a:groups]
 	let b:css_color_pat = a:type == 'css' ? s:_csscolor : a:type == 'hex' ? s:_hexcolor : '$^'
 	let b:css_color_hi  = {}
 	let b:css_color_syn = {}
 
 	augroup CSSColor
 		autocmd! * <buffer>
+		autocmd ColorScheme              <buffer> call css_color#reinit()
 		autocmd BufWinEnter              <buffer> call s:create_matches()
 		autocmd CursorMoved,CursorMovedI <buffer> call s:parse_screen()
 		autocmd BufWinLeave              <buffer> call s:clear_matches()
