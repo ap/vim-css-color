@@ -1,4 +1,5 @@
 " Language:     Colorful CSS Color Preview
+" Author:       Aristotle Pagaltzis <pagaltzis@gmx.de>
 " Author:       Greg Werbin <ourobourbon@gmail.com>
 
 " ft=coffee includes javascript, but mostly sets up own syntax groups
