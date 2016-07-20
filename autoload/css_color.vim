@@ -192,7 +192,7 @@ function! s:create_syn_match()
 		endif
 
 		call s:create_highlight( rgb_color, is_bright )
-		let b:css_color_hi[rgb_color] = 1
+		let b:css_color_hi[rgb_color] = is_bright
 	endif
 
 	" iff pattern ends on word character, require word break to match
@@ -317,6 +317,11 @@ function! css_color#init(type, keywords, groups)
 	hi BG008080 guibg=#008080 guifg=#FFFFFF ctermbg=30  ctermfg=231
 	hi BG00ffff guibg=#00FFFF guifg=#000000 ctermbg=51  ctermfg=16
 
+	call extend( b:css_color_hi,
+		\{'000000':0,'c0c0c0':1,'808080':1,'ffffff':1,'800000':0,'ff0000':0
+		\,'800080':0,'ff00ff':0,'008000':0,'00ff00':1,'808000':0,'ffff00':1
+		\,'000080':0,'0000ff':0,'008080':0,'00ffff':1} )
+
 	syn keyword BG000000 black   contained containedin=@colorableGroup
 	syn keyword BGc0c0c0 silver  contained containedin=@colorableGroup
 	syn keyword BG808080 gray    contained containedin=@colorableGroup
@@ -334,7 +339,7 @@ function! css_color#init(type, keywords, groups)
 	syn keyword BG008080 teal    contained containedin=@colorableGroup
 	syn keyword BG00ffff aqua    contained containedin=@colorableGroup
 
-	if a:keywords == 'basic' | return | endif
+	if a:keywords == 'basic' | call extend( s:color_bright, b:css_color_hi ) | return | endif
 
 	" W3C extended colors
 
@@ -460,6 +465,29 @@ function! css_color#init(type, keywords, groups)
 	hi BGfffafa guibg=#FFFAFA guifg=#000000 ctermbg=15  ctermfg=16
 	hi BGffffe0 guibg=#FFFFE0 guifg=#000000 ctermbg=230 ctermfg=16
 	hi BGfffff0 guibg=#FFFFF0 guifg=#000000 ctermbg=15  ctermfg=16
+
+	call extend( b:css_color_hi,
+		\{'00008b':0,'0000cd':0,'006400':0,'008b8b':0,'00bfff':1,'00ced1':1
+		\,'00fa9a':1,'00ff7f':1,'191970':0,'1e90ff':1,'20b2aa':1,'228b22':0
+		\,'2e8b57':0,'2f4f4f':0,'32cd32':1,'3cb371':1,'40e0d0':1,'4169e1':0
+		\,'4682b4':0,'483d8b':0,'48d1cc':1,'4b0082':0,'556b2f':0,'5f9ea0':1
+		\,'6495ed':1,'66cdaa':1,'696969':0,'6a5acd':0,'6b8e23':0,'708090':1
+		\,'778899':1,'7b68ee':1,'7cfc00':1,'7fff00':1,'7fffd4':1,'87ceeb':1
+		\,'87cefa':1,'8a2be2':0,'8b0000':0,'8b008b':0,'8b4513':0,'8fbc8f':1
+		\,'90ee90':1,'9370d8':1,'9400d3':0,'98fb98':1,'9932cc':0,'9acd32':1
+		\,'a0522d':0,'a52a2a':0,'a9a9a9':1,'add8e6':1,'adff2f':1,'afeeee':1
+		\,'b0c4de':1,'b0e0e6':1,'b22222':0,'b8860b':1,'ba55d3':1,'bc8f8f':1
+		\,'bdb76b':1,'c71585':0,'cd5c5c':1,'cd853f':1,'d2691e':1,'d2b48c':1
+		\,'d3d3d3':1,'d87093':1,'d8bfd8':1,'da70d6':1,'daa520':1,'dc143c':0
+		\,'dcdcdc':1,'dda0dd':1,'deb887':1,'e0ffff':1,'e6e6fa':1,'e9967a':1
+		\,'ee82ee':1,'eee8aa':1,'f08080':1,'f0e68c':1,'f0f8ff':1,'f0fff0':1
+		\,'f0ffff':1,'f4a460':1,'f5deb3':1,'f5f5dc':1,'f5f5f5':1,'f5fffa':1
+		\,'f8f8ff':1,'fa8072':1,'faebd7':1,'faf0e6':1,'fafad2':1,'fdf5e6':1
+		\,'ff1493':0,'ff4500':0,'ff6347':1,'ff69b4':1,'ff7f50':1,'ff8c00':1
+		\,'ffa07a':1,'ffa500':1,'ffb6c1':1,'ffc0cb':1,'ffd700':1,'ffdab9':1
+		\,'ffdead':1,'ffe4b5':1,'ffe4c4':1,'ffe4e1':1,'ffebcd':1,'ffefd5':1
+		\,'fff0f5':1,'fff5ee':1,'fff8dc':1,'fffacd':1,'fffaf0':1,'fffafa':1
+		\,'ffffe0':1,'fffff0':1} )
 
 	syn keyword BGf0f8ff AliceBlue            contained containedin=@colorableGroup
 	syn keyword BGfaebd7 AntiqueWhite         contained containedin=@colorableGroup
@@ -592,4 +620,6 @@ function! css_color#init(type, keywords, groups)
 	syn keyword BGf5deb3 Wheat                contained containedin=@colorableGroup
 	syn keyword BGf5f5f5 WhiteSmoke           contained containedin=@colorableGroup
 	syn keyword BG9acd32 YellowGreen          contained containedin=@colorableGroup
+
+	call extend( s:color_bright, b:css_color_hi )
 endfunction
