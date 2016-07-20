@@ -7,4 +7,8 @@
 " (this refers to the https://github.com/kchmck/vim-coffee-script plugin)
 if &filetype == 'coffee' | finish | endif
 
-call css_color#init('hex', 'extended', 'javaScriptComment,javaScriptLineComment,javaScriptStringS,javaScriptStringD')
+" javaScriptX = default Vim syntax, jsX = https://github.com/pangloss/vim-javascript
+call css_color#init('hex', 'extended'
+	\, 'javaScriptComment,javaScriptLineComment,javaScriptStringS,javaScriptStringD'
+	\. 'jsComment,jsString,jsTemplateString,jsObjectKeyString,jsObjectStringKey,jsClassStringKey'
+	\)
