@@ -251,8 +251,7 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 function! css_color#reinit()
-	let [type, keywords, groups] = b:css_color_arg
-	call css_color#init(type, keywords, groups)
+	call map( keys( b:css_color_hi ), 's:create_highlight( v:val, s:color_bright[v:val] )' )
 endfunction
 
 function! css_color#extend(groups) " if already initialized (by other filetype)
@@ -262,7 +261,6 @@ endfunction
 function! css_color#init(type, keywords, groups)
 	exe 'syn cluster colorableGroup contains=' . a:groups
 
-	let b:css_color_arg = [a:type, a:keywords, a:groups]
 	let b:css_color_pat = a:type == 'css' ? s:_csscolor : a:type == 'hex' ? s:_hexcolor : '$^'
 	let b:css_color_hi  = {}
 	let b:css_color_syn = {}
