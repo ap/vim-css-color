@@ -255,14 +255,14 @@ function! css_color#reinit()
 endfunction
 
 function! css_color#enable()
-	exe 'syn cluster colorableGroup add=' . b:css_color_grp
+	exe 'syn cluster colorableGroup add=' . join( b:css_color_grp, ',' )
 	autocmd CSSColor CursorMoved,CursorMovedI <buffer> call s:parse_screen()
 	let b:css_color_off = 0
 	call s:parse_screen()
 endfunction
 
 function! css_color#disable()
-	exe 'syn cluster colorableGroup remove=' . b:css_color_grp
+	exe 'syn cluster colorableGroup remove=' . join( b:css_color_grp, ',' )
 	autocmd! CSSColor CursorMoved,CursorMovedI <buffer>
 	let b:css_color_off = 1
 endfunction
@@ -274,14 +274,15 @@ function! css_color#toggle()
 	endif
 endfunction
 
-function! css_color#extend(groups) " if already initialized (by other filetype)
-	exe 'syn cluster colorableGroup add=' . a:groups
-	let b:css_color_grp .= ',' . a:groups
-endfunction
+let s:type         = [ 'none', 'hex', 'css', 'none' ] " with wraparound for index() == -1
+let s:pat_for_type = [ '^$', s:_hexcolor, s:_csscolor, '^$' ]
 
 function! css_color#init(type, keywords, groups)
-	let b:css_color_grp = a:groups
-	let b:css_color_pat = a:type == 'css' ? s:_csscolor : a:type == 'hex' ? s:_hexcolor : '$^'
+	let new_type = index( s:type, a:type )
+	let old_type = index( s:pat_for_type, get( b:, 'css_color_pat', '$^' ) )
+
+	let b:css_color_pat = s:pat_for_type[ max( [ old_type, new_type ] ) ]
+	let b:css_color_grp = extend( get( b:, 'css_color_grp', [] ), split( a:groups, ',' ), 0 )
 	let b:css_color_hi  = {}
 	let b:css_color_syn = {}
 
