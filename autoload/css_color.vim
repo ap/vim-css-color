@@ -254,26 +254,45 @@ function! css_color#reinit()
 	call map( keys( b:css_color_hi ), 's:create_highlight( v:val, s:color_bright[v:val] )' )
 endfunction
 
+function! css_color#enable()
+	exe 'syn cluster colorableGroup add=' . b:css_color_grp
+	autocmd CSSColor CursorMoved,CursorMovedI <buffer> call s:parse_screen()
+	let b:css_color_off = 0
+	call s:parse_screen()
+endfunction
+
+function! css_color#disable()
+	exe 'syn cluster colorableGroup remove=' . b:css_color_grp
+	autocmd! CSSColor CursorMoved,CursorMovedI <buffer>
+	let b:css_color_off = 1
+endfunction
+
+function! css_color#toggle()
+	if ! exists('b:css_color_off') | return | endif
+	if b:css_color_off | call css_color#enable()
+	else               | call css_color#disable()
+	endif
+endfunction
+
 function! css_color#extend(groups) " if already initialized (by other filetype)
 	exe 'syn cluster colorableGroup add=' . a:groups
+	let b:css_color_grp .= ',' . a:groups
 endfunction
 
 function! css_color#init(type, keywords, groups)
-	exe 'syn cluster colorableGroup contains=' . a:groups
-
+	let b:css_color_grp = a:groups
 	let b:css_color_pat = a:type == 'css' ? s:_csscolor : a:type == 'hex' ? s:_hexcolor : '$^'
 	let b:css_color_hi  = {}
 	let b:css_color_syn = {}
 
 	augroup CSSColor
 		autocmd! * <buffer>
-		autocmd ColorScheme              <buffer> call css_color#reinit()
-		autocmd BufWinEnter              <buffer> call s:create_matches()
-		autocmd CursorMoved,CursorMovedI <buffer> call s:parse_screen()
-		autocmd BufWinLeave              <buffer> call s:clear_matches()
+		autocmd ColorScheme <buffer> call css_color#reinit()
+		autocmd BufWinEnter <buffer> call s:create_matches()
+		autocmd BufWinLeave <buffer> call s:clear_matches()
 	augroup END
 
-	call s:parse_screen()
+	call css_color#enable()
 
 	if a:keywords == 'none' | return | endif
 
