@@ -255,14 +255,14 @@ function! css_color#reinit()
 endfunction
 
 function! css_color#enable()
-	exe 'syn cluster colorableGroup add=' . join( b:css_color_grp, ',' )
+	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup add=' . join( b:css_color_grp, ',' ) | endif
 	autocmd CSSColor CursorMoved,CursorMovedI <buffer> call s:parse_screen()
 	let b:css_color_off = 0
 	call s:parse_screen()
 endfunction
 
 function! css_color#disable()
-	exe 'syn cluster colorableGroup remove=' . join( b:css_color_grp, ',' )
+	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup remove=' . join( b:css_color_grp, ',' ) | endif
 	autocmd! CSSColor CursorMoved,CursorMovedI <buffer>
 	let b:css_color_off = 1
 endfunction
