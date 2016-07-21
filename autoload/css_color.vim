@@ -251,7 +251,7 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 function! css_color#reinit()
-	call map( keys( b:css_color_hi ), 's:create_highlight( v:val, s:color_bright[v:val] )' )
+	call filter( keys( b:css_color_hi ), 's:create_highlight( v:val, s:color_bright[v:val] )' )
 endfunction
 
 function! css_color#enable()
