@@ -238,13 +238,19 @@ let s:_listsep    = s:_ws_ . ','
 let s:_otherargs_ = '\%(,[^)]*\)\?'
 let s:_funcexpr   = s:_funcname . '[(]' . s:_numval . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_ws_ . s:_otherargs_ . '[)]'
 let s:_csscolor   = s:_hexcolor . '\|' . s:_funcexpr
+" N.B. sloppy heuristic constants for performance reasons:
+"      a) start somewhere left of screen in case of partially visible colorref
+"      b) take some multiple of &columns to handle multibyte chars etc
 " N.B. these substitute() calls are here just for the side effect
 "      of invoking s:create_syn_match during substitution -- because
 "      match() and friends do not allow finding all matches in a single
 "      scan without examining the start of the string over and over
 function! s:parse_screen()
 	call s:clear_matches()
-	call substitute( join( getline('w0','w$'), "\n" ), b:css_color_pat, '\=s:create_syn_match()', 'g' )
+	let leftcol = winsaveview().leftcol
+	let left = max([ leftcol - 15, 0 ])
+	let width = &columns * 4
+	call filter( range( line('w0'), line('w$') ), 'substitute( strpart( getline(v:val), col([v:val, left]), width ), b:css_color_pat, ''\=s:create_syn_match()'', ''g'' )' )
 	call s:create_matches()
 endfunction
 
