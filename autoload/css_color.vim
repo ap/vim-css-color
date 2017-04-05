@@ -43,7 +43,7 @@ for i in range(0, 255)
 	let s:hex[ printf( '%02x', i ) ] = i
 endfor
 
-if has('gui_running')
+if has('gui_running') || (has('termguicolors') && &termguicolors)
 	function! s:create_highlight(color, is_bright)
 		exe 'hi BG'.a:color 'guibg=#'.a:color 'guifg=#'.( a:is_bright ? '000000' : 'ffffff' )
 	endfunction
