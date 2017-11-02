@@ -1,0 +1,5 @@
+colorscheme skammer
+set guioptions=gmc guicursor+=a:blinkon0
+set guifont=SF_Mono_Light:h14
+set columns=81 lines=26
+let &titlestring='%t (~) - VIM'

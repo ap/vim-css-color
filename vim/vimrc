@@ -1,0 +1,3 @@
+set nocompatible nobackup noswapfile ts=2 viminfo=
+syntax on
+runtime plugin/matchparen.vim
