@@ -222,7 +222,6 @@ function! s:parse_screen()
 	let left = max([ leftcol - 15, 0 ])
 	let width = &columns * 4
 	call filter( range( line('w0'), line('w$') ), 'substitute( strpart( getline(v:val), col([v:val, left]), width ), b:css_color_pat, ''\=s:create_syn_match()'', ''g'' )' )
-	call s:create_matches()
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -233,9 +232,10 @@ endfunction
 
 function! css_color#enable()
 	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup add=' . join( b:css_color_grp, ',' ) | endif
-	autocmd CSSColor CursorMoved,CursorMovedI <buffer> call s:parse_screen()
+	autocmd CSSColor CursorMoved,CursorMovedI <buffer> call s:parse_screen() | call s:create_matches()
 	let b:css_color_off = 0
 	call s:parse_screen()
+	call s:create_matches()
 endfunction
 
 function! css_color#disable()
