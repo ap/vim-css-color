@@ -236,9 +236,9 @@ function! css_color#enable()
 	augroup CSSColor
 		autocmd! * <buffer>
 		if has('nvim-0.3.1')
-			autocmd CursorMoved,CursorMovedI <buffer> call s:parse_screen()
+			autocmd CursorHold,CursorHoldI <buffer> call s:parse_screen()
 		else
-			autocmd CursorMoved,CursorMovedI <buffer> call s:parse_screen() | call s:create_matches()
+			autocmd CursorHold,CursorHoldI <buffer> call s:parse_screen() | call s:create_matches()
 			autocmd BufWinEnter <buffer> call s:create_matches()
 			autocmd BufWinLeave <buffer> call s:clear_matches()
 		endif
