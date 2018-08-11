@@ -1,6 +1,3 @@
-" Language:     Colorful CSS Color Preview
-" Author:       Aristotle Pagaltzis <pagaltzis@gmx.de>
-
 " variable               | property       | multiline      | end-of-line | plugin
 " -----------------------+----------------+----------------+-------------+---------
 "                lessCssAttribute         | lessCssComment | lessComment | https://github.com/genoma/vim-less
