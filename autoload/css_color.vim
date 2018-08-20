@@ -184,7 +184,13 @@ endfunction
 
 function! s:create_matches()
 	call s:clear_matches()
-	if ! &l:cursorline | return | endif
+
+	" WARNING! Do not make it be one-liner by using '|' separator, it causes this bug:
+	" https://github.com/ap/vim-css-color/issues/95
+	if ! &l:cursorline
+		return
+	endif
+
 	" adds matches based that duplicate the highlighted colors on the current line
 	let lnr = line('.')
 	let group = ''
@@ -231,7 +237,12 @@ function! css_color#reinit()
 endfunction
 
 function! css_color#enable()
-	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup add=' . join( b:css_color_grp, ',' ) | endif
+	" WARNING! Do not make it be one-liner by using '|' separator, it causes this bug:
+	" https://github.com/ap/vim-css-color/issues/95
+	if len( b:css_color_grp )
+		exe 'syn cluster colorableGroup add=' . join( b:css_color_grp, ',' )
+	endif
+
 	autocmd CSSColor CursorMoved,CursorMovedI <buffer> call s:parse_screen() | call s:create_matches()
 	let b:css_color_off = 0
 	call s:parse_screen()
