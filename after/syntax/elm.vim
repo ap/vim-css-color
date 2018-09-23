@@ -1,1 +1,1 @@
-call css_color#init('hex', 'none', 'elmComment,elmString')
+call css_color#init('hex', 'none', 'elmLineComment,elmString')
