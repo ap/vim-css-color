@@ -3,7 +3,7 @@
 " Commit:       $Format:%H$
 " Licence:      The MIT License (MIT)
 
-if v:version < 700 || !( has('syntax') || has('gui_running') || has('nvim') || &t_Co==256 )
+if ! ( v:version >= 700 && has('syntax') && ( has('gui_running') || has('nvim') || &t_Co == 256 ) )
 	function! css_color#init(type, keywords, groups)
 	endfunction
 	function! css_color#extend(groups)
