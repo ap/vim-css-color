@@ -189,7 +189,7 @@ function! s:create_matches()
 	let lnr = line('.')
 	let group = ''
 	let groupstart = 0
-	let endcol = col('$')
+	let endcol = &l:synmaxcol ? &l:synmaxcol : col('$')
 	for col in range( 1, endcol )
 		let nextgroup = col < endcol ? synIDattr( synID( lnr, col, 1 ), 'name' ) : ''
 		if group == nextgroup | continue | endif
