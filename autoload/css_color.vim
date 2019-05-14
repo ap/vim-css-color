@@ -233,7 +233,13 @@ endfunction
 function! css_color#enable()
 	if ! b:css_color_off | return | endif
 	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup add=' . join( b:css_color_grp, ',' ) | endif
-	autocmd CSSColor CursorMoved,CursorMovedI <buffer> call s:parse_screen() | call s:create_matches()
+	augroup CSSColor
+		autocmd! * <buffer>
+		autocmd CursorMoved,CursorMovedI <buffer> call s:parse_screen() | call s:create_matches()
+		autocmd BufWinEnter <buffer> call s:create_matches()
+		autocmd BufWinLeave <buffer> call s:clear_matches()
+		autocmd ColorScheme <buffer> call css_color#reinit()
+	augroup END
 	let b:css_color_off = 0
 	doautocmd CSSColor CursorMoved
 endfunction
@@ -241,7 +247,7 @@ endfunction
 function! css_color#disable()
 	if b:css_color_off | return | endif
 	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup remove=' . join( b:css_color_grp, ',' ) | endif
-	autocmd! CSSColor CursorMoved,CursorMovedI <buffer>
+	autocmd! CSSColor * <buffer>
 	let b:css_color_off = 1
 endfunction
 
@@ -263,13 +269,6 @@ function! css_color#init(type, keywords, groups)
 	let b:css_color_hi  = {}
 	let b:css_color_syn = {}
 	let b:css_color_off = 1
-
-	augroup CSSColor
-		autocmd! * <buffer>
-		autocmd ColorScheme <buffer> call css_color#reinit()
-		autocmd BufWinEnter <buffer> call s:create_matches()
-		autocmd BufWinLeave <buffer> call s:clear_matches()
-	augroup END
 
 	call css_color#enable()
 
