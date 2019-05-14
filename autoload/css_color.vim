@@ -231,6 +231,7 @@ function! css_color#reinit()
 endfunction
 
 function! css_color#enable()
+	if ! b:css_color_off | return | endif
 	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup add=' . join( b:css_color_grp, ',' ) | endif
 	autocmd CSSColor CursorMoved,CursorMovedI <buffer> call s:parse_screen() | call s:create_matches()
 	let b:css_color_off = 0
@@ -239,13 +240,13 @@ function! css_color#enable()
 endfunction
 
 function! css_color#disable()
+	if b:css_color_off | return | endif
 	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup remove=' . join( b:css_color_grp, ',' ) | endif
 	autocmd! CSSColor CursorMoved,CursorMovedI <buffer>
 	let b:css_color_off = 1
 endfunction
 
 function! css_color#toggle()
-	if ! exists('b:css_color_off') | return | endif
 	if b:css_color_off | call css_color#enable()
 	else               | call css_color#disable()
 	endif
@@ -262,6 +263,7 @@ function! css_color#init(type, keywords, groups)
 	let b:css_color_grp = extend( get( b:, 'css_color_grp', [] ), split( a:groups, ',' ), 0 )
 	let b:css_color_hi  = {}
 	let b:css_color_syn = {}
+	let b:css_color_off = 1
 
 	augroup CSSColor
 		autocmd! * <buffer>
