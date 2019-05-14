@@ -235,9 +235,13 @@ function! css_color#enable()
 	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup add=' . join( b:css_color_grp, ',' ) | endif
 	augroup CSSColor
 		autocmd! * <buffer>
-		autocmd CursorMoved,CursorMovedI <buffer> call s:parse_screen() | call s:create_matches()
-		autocmd BufWinEnter <buffer> call s:create_matches()
-		autocmd BufWinLeave <buffer> call s:clear_matches()
+		if has('nvim-0.3.1')
+			autocmd CursorMoved,CursorMovedI <buffer> call s:parse_screen()
+		else
+			autocmd CursorMoved,CursorMovedI <buffer> call s:parse_screen() | call s:create_matches()
+			autocmd BufWinEnter <buffer> call s:create_matches()
+			autocmd BufWinLeave <buffer> call s:clear_matches()
+		endif
 		autocmd ColorScheme <buffer> call css_color#reinit()
 	augroup END
 	let b:css_color_off = 0
