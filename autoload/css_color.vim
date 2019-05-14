@@ -235,8 +235,7 @@ function! css_color#enable()
 	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup add=' . join( b:css_color_grp, ',' ) | endif
 	autocmd CSSColor CursorMoved,CursorMovedI <buffer> call s:parse_screen() | call s:create_matches()
 	let b:css_color_off = 0
-	call s:parse_screen()
-	call s:create_matches()
+	doautocmd CSSColor CursorMoved
 endfunction
 
 function! css_color#disable()
