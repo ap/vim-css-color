@@ -6,6 +6,6 @@ if &syntax =~# '\(^\|\.\)coffee\($\|\.\)' | finish | endif
 
 " javaScriptX = default Vim syntax, jsX = https://github.com/pangloss/vim-javascript
 call css_color#init('hex', 'extended'
-	\, 'javaScriptComment,javaScriptLineComment,javaScriptStringS,javaScriptStringD,'
-	\. 'jsComment,jsString,jsTemplateString,jsObjectKeyString,jsObjectStringKey,jsClassStringKey'
+	\,  'javaScriptComment,javaScriptLineComment,javaScriptStringS,javaScriptStringD'
+	\. ',jsComment,jsString,jsTemplateString,jsObjectKeyString,jsObjectStringKey,jsClassStringKey'
 	\)
