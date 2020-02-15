@@ -290,3 +290,5 @@ function! css_color#_init(type, keywords, groups)
 		call extend( s:color_bright, b:css_color_hi )
 	endif
 endfunction
+
+" vim: noet sw=2 ts=2 sts=2
