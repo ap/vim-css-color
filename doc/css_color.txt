@@ -1,0 +1,47 @@
+*css_color.txt* css_color
+
+CSS_COLOR - TABLE OF CONTENTS                                      *css_color*
+==============================================================================
+
+  Settings...........................................|css_color-settings|
+  Commands...........................................|css_color-commands|
+  License............................................|css_color-license|
+
+
+
+SETTINGS                                                  *css_color-settings*
+==============================================================================
+
+*g:css_color_disabled_at_start*         (default: 0)
+
+By default, the plugin is activated automatically for every supported
+filetype. If you want to control activation manually (through the commands
+described below), set this option to 1.
+
+
+
+COMMANDS                                                  *css_color-commands*
+==============================================================================
+
+CssColorEnable[!]                                            *:CssColorEnable*
+CssColorDisable[!]                                          *:CssColorDisable*
+CssColorToggle[!]                                            *:CssColorToggle*
+
+These commands work on a buffer basis, unless <bang> is used, in this case the
+global state is set.
+
+Already loaded buffers are unaffected by the <bang>, because highlighting is
+initialized when the buffer is first loaded. Newly added buffers will respect
+the new setting.
+
+
+
+LICENSE                                                    *css_color-license*
+==============================================================================
+
+MIT license
+
+
+==============================================================================
+vim:tw=78:ft=help:norl:et:fen:fdl=0:
+
