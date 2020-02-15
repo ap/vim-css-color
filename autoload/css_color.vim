@@ -218,10 +218,13 @@ let s:_csscolor   = s:_hexcolor . '\|' . s:_funcexpr
 "      match() and friends do not allow finding all matches in a single
 "      scan without examining the start of the string over and over
 function! s:parse_screen()
-	let leftcol = winsaveview().leftcol
-	let left = max([ leftcol - 15, 0 ])
-	let width = &columns * 4
-	call filter( range( line('w0'), line('w$') ), 'substitute( strpart( getline(v:val), col([v:val, left]), width ), b:css_color_pat, ''\=s:create_syn_match()'', ''g'' )' )
+	try
+		let leftcol = winsaveview().leftcol
+		let left = max([ leftcol - 15, 0 ])
+		let width = &columns * 4
+		call filter( range( line('w0'), line('w$') ), 'substitute( strpart( getline(v:val), col([v:val, left]), width ), b:css_color_pat, ''\=s:create_syn_match()'', ''g'' )' )
+	catch /E121:/ "undefined variable
+	endtry
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
