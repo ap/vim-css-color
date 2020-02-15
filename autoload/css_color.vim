@@ -231,13 +231,12 @@ function! css_color#reinit()
 endfunction
 
 function! css_color#enable(bang)
-	if ! css_color#is_disabled() | return | endif
-	if a:bang | let g:css_color_disabled = 0 | endif
+	if a:bang | let g:css_color_global = 1 | endif
 	if ! exists('b:css_color_off')
-		let b:css_color_off = 0
 		doautocmd <nomodeline> FileType
 		return
 	endif
+	if ! b:css_color_off | return | endif
 	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup add=' . join( b:css_color_grp, ',' ) | endif
 	augroup CSSColor
 		autocmd! * <buffer>
@@ -255,18 +254,16 @@ function! css_color#enable(bang)
 endfunction
 
 function! css_color#disable(bang)
-	if css_color#is_disabled() | return | endif
+	if a:bang | let g:css_color_global = 0 | endif
+	if get(b:, 'css_color_off', 1) | return | endif
 	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup remove=' . join( b:css_color_grp, ',' ) | endif
 	autocmd! CSSColor * <buffer>
 	let b:css_color_off = 1
-	if a:bang
-		let g:css_color_disabled = 1
-	endif
 endfunction
 
 function! css_color#toggle(bang)
-	if css_color#is_disabled() | call css_color#enable(a:bang)
-	else                       | call css_color#disable(a:bang)
+	if get(b:, 'css_color_off', 1) | call css_color#enable(a:bang)
+	else                           | call css_color#disable(a:bang)
 	endif
 endfunction
 

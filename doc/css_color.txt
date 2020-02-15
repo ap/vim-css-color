@@ -12,11 +12,11 @@ CSS_COLOR - TABLE OF CONTENTS                                      *css_color*
 SETTINGS                                                  *css_color-settings*
 ==============================================================================
 
-*g:css_color_disabled_at_start*         (default: 0)
+*g:css_color_global*         (default: 1)
 
 By default, the plugin is activated automatically for every supported
 filetype. If you want to control activation manually (through the commands
-described below), set this option to 1.
+described below), set this option to 0.
 
 
 
