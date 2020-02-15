@@ -3,14 +3,6 @@
 " Commit:       $Format:%H$
 " Licence:      The MIT License (MIT)
 
-if ! ( v:version >= 700 && has('syntax') && ( has('gui_running') || has('nvim') || &t_Co == 256 ) )
-	function! css_color#init(type, keywords, groups)
-	endfunction
-	function! css_color#extend(groups)
-	endfunction
-	finish
-endif
-
 function! s:rgb2color(r,g,b)
 	" Convert 80% -> 204, 100% -> 255, etc.
 	let rgb = map( [a:r,a:g,a:b], 'v:val =~ "%$" ? ( 255 * v:val ) / 100 : v:val' )
