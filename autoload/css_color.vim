@@ -230,9 +230,10 @@ function! css_color#reinit()
 	call filter( keys( b:css_color_hi ), 's:create_highlight( v:val, s:color_bright[v:val] )' )
 endfunction
 
-function! css_color#enable()
-	if ! s:is_disabled() | return
-	elseif ! exists('b:css_color_off')
+function! css_color#enable(bang)
+	if ! s:is_disabled() | return | endif
+	if a:bang | let s:css_color_disabled = 0 | endif
+	if ! exists('b:css_color_off')
 		let b:css_color_off = 0
 		doautocmd <nomodeline> FileType
 		return
@@ -253,16 +254,19 @@ function! css_color#enable()
 	doautocmd CSSColor CursorMoved
 endfunction
 
-function! css_color#disable()
+function! css_color#disable(bang)
 	if s:is_disabled() | return | endif
 	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup remove=' . join( b:css_color_grp, ',' ) | endif
 	autocmd! CSSColor * <buffer>
 	let b:css_color_off = 1
+	if a:bang
+		let s:css_color_disabled = 1
+	endif
 endfunction
 
-function! css_color#toggle()
-	if s:is_disabled() | call css_color#enable()
-	else               | call css_color#disable()
+function! css_color#toggle(bang)
+	if s:is_disabled() | call css_color#enable(a:bang)
+	else               | call css_color#disable(a:bang)
 	endif
 endfunction
 
@@ -280,7 +284,7 @@ function! css_color#init(type, keywords, groups)
 	let b:css_color_syn = {}
 	let b:css_color_off = 1
 
-	call css_color#enable()
+	call css_color#enable(0)
 
 	if a:keywords != 'none'
 		exe 'syntax include syntax/colornames/'.a:keywords.'.vim'
@@ -289,5 +293,7 @@ function! css_color#init(type, keywords, groups)
 endfunction
 
 function! s:is_disabled()
-	return get( b:, 'css_color_off', get( g:, 'css_color_disabled_at_start', 0 ) )
+	return get( b:, 'css_color_off',
+				\get( s:, 'css_color_disabled',
+				\get( g:, 'css_color_disabled_at_start', 0 ) ) )
 endfunction
