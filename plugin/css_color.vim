@@ -1,5 +1,5 @@
 if exists('g:loaded_css_color')
-  finish
+	finish
 endif
 let g:loaded_css_color = 1
 
@@ -12,7 +12,7 @@ command! -bar -bang CssColorToggle    call css_color#toggle(<bang>0)
 
 function! css_color#init(type, keywords, groups)
 	if css_color#is_disabled() | return | endif
-  call css_color#_init(a:type, a:keywords, a:groups)
+	call css_color#_init(a:type, a:keywords, a:groups)
 endfunction
 
 function! css_color#is_disabled()
