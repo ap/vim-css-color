@@ -228,6 +228,7 @@ endfunction
 function! css_color#enable(bang)
 	if a:bang | let g:css_color_global = 1 | endif
 	if ! exists('b:css_color_off')
+		let b:css_color_off = 1
 		doautocmd <nomodeline> FileType
 		return
 	endif

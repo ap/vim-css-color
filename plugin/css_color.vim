@@ -23,7 +23,7 @@ if !exists('g:css_color_global')
 endif
 
 function! css_color#init(type, keywords, groups)
-	if g:css_color_global
+	if g:css_color_global || exists('b:css_color_off')
 		call css_color#_init(a:type, a:keywords, a:groups)
 	endif
 endfunction
