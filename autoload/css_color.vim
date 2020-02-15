@@ -231,8 +231,8 @@ function! css_color#reinit()
 endfunction
 
 function! css_color#enable(bang)
-	if ! s:is_disabled() | return | endif
-	if a:bang | let s:css_color_disabled = 0 | endif
+	if ! css_color#is_disabled() | return | endif
+	if a:bang | let g:css_color_disabled = 0 | endif
 	if ! exists('b:css_color_off')
 		let b:css_color_off = 0
 		doautocmd <nomodeline> FileType
@@ -255,26 +255,25 @@ function! css_color#enable(bang)
 endfunction
 
 function! css_color#disable(bang)
-	if s:is_disabled() | return | endif
+	if css_color#is_disabled() | return | endif
 	if len( b:css_color_grp ) | exe 'syn cluster colorableGroup remove=' . join( b:css_color_grp, ',' ) | endif
 	autocmd! CSSColor * <buffer>
 	let b:css_color_off = 1
 	if a:bang
-		let s:css_color_disabled = 1
+		let g:css_color_disabled = 1
 	endif
 endfunction
 
 function! css_color#toggle(bang)
-	if s:is_disabled() | call css_color#enable(a:bang)
-	else               | call css_color#disable(a:bang)
+	if css_color#is_disabled() | call css_color#enable(a:bang)
+	else                       | call css_color#disable(a:bang)
 	endif
 endfunction
 
 let s:type         = [ 'none', 'hex', 'css', 'none' ] " with wraparound for index() == -1
 let s:pat_for_type = [ '^$', s:_hexcolor, s:_csscolor, '^$' ]
 
-function! css_color#init(type, keywords, groups)
-	if s:is_disabled() | return | endif
+function! css_color#_init(type, keywords, groups)
 	let new_type = index( s:type, a:type )
 	let old_type = index( s:pat_for_type, get( b:, 'css_color_pat', '$^' ) )
 
@@ -290,10 +289,4 @@ function! css_color#init(type, keywords, groups)
 		exe 'syntax include syntax/colornames/'.a:keywords.'.vim'
 		call extend( s:color_bright, b:css_color_hi )
 	endif
-endfunction
-
-function! s:is_disabled()
-	return get( b:, 'css_color_off',
-				\get( s:, 'css_color_disabled',
-				\get( g:, 'css_color_disabled_at_start', 0 ) ) )
 endfunction
