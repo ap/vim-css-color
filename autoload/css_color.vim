@@ -257,6 +257,12 @@ function! css_color#disable(bang)
 	let b:css_color_off = 1
 endfunction
 
+function! css_color#any()
+	setlocal iskeyword+=#
+	syn match CssColorHex '\<#[0-9a-fA-F]\{6}\>'
+	call css_color#_init('hex', 'none', 'CssColorHex')
+endfunction
+
 function! css_color#toggle(bang)
 	if get(b:, 'css_color_off', 1) | call css_color#enable(a:bang)
 	else                           | call css_color#disable(a:bang)
