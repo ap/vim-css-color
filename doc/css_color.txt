@@ -23,9 +23,9 @@ described below), set this option to 0.
 COMMANDS                                                  *css_color-commands*
 ==============================================================================
 
-    `CssColorEnable[!]`                                      *:CssColorEnable*
-    `CssColorDisable[!]`                                    *:CssColorDisable*
-    `CssColorToggle[!]`                                      *:CssColorToggle*
+    `ColorEnable[!]`                                            *:ColorEnable*
+    `ColorDisable[!]`                                          *:ColorDisable*
+    `ColorToggle[!]`                                            *:ColorToggle*
 
 These commands work on a buffer basis, unless <bang> is used, in this case the
 global state is set.
@@ -34,10 +34,15 @@ Already loaded buffers are unaffected by the <bang>, because highlighting is
 initialized when the buffer is first loaded. Newly added buffers will respect
 the new setting.
 
-    `CssColorAny`                                               *:CssColorAny*
+    `ColorAny`                                                     *:ColorAny*
 
 You can use this command to apply the highlight to unsupported filetypes. It
 only works with hex color codes.
+
+    `ColorSyn` [group]                                             *:ColorSyn*
+
+Enable coloring inside given highlight group, or group at cursor. It only
+works with hex color codes.
 
 
 

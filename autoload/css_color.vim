@@ -257,6 +257,11 @@ function! css_color#disable(bang)
 	let b:css_color_off = 1
 endfunction
 
+function! css_color#syn(name)
+	let name = empty(a:name) ? synIDattr(synID(line("."), col('.'), 1), "name") : a:name
+	call css_color#_init('hex', 'none', name)
+endfunction
+
 function! css_color#any()
 	setlocal iskeyword+=#
 	syn match CssColorHex '\<#[0-9a-fA-F]\{6}\>'

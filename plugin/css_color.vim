@@ -14,10 +14,12 @@ let g:loaded_css_color = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-command! -bar -bang CssColorEnable    call css_color#enable(<bang>0)
-command! -bar -bang CssColorDisable   call css_color#disable(<bang>0)
-command! -bar -bang CssColorToggle    call css_color#toggle(<bang>0)
-command! -bar       CssColorAny       call css_color#any()
+command! -bar -bang ColorEnable    call css_color#enable(<bang>0)
+command! -bar -bang ColorDisable   call css_color#disable(<bang>0)
+command! -bar -bang ColorToggle    call css_color#toggle(<bang>0)
+command! -bar       ColorAny       call css_color#any()
+
+command! -nargs=? -complete=highlight ColorSyn call css_color#syn(<q-args>)
 
 if !exists('g:css_color_global')
 	let g:css_color_global = 1
