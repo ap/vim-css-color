@@ -258,8 +258,8 @@ function! css_color#toggle()
 	endif
 endfunction
 
-let s:type         = [ 'none', 'hex', 'css', 'none' ] " with wraparound for index() == -1
-let s:pat_for_type = [ '^$', s:_hexcolor, s:_csscolor, '^$' ]
+let s:type         = [ 'none', 'hex', 'rgba', 'css', 'none' ] " with wraparound for index() == -1
+let s:pat_for_type = [ '^$', s:_hexcolor, s:_rgbacolor, s:_csscolor, '^$' ]
 
 function! css_color#init(type, keywords, groups)
 	let new_type = index( s:type, a:type )
