@@ -2,7 +2,7 @@
 
 <div align="center">
 A very fast, multi-syntax context-sensitive color name highlighter<br>
-<img src="https://raw.githubusercontent.com/ap/vim-css-color/a56592557e487b7299a7c7dcc3333282a157b4ba/screenshot.png" width="844" height="553">
+<img src="https://raw.githubusercontent.com/ap/vim-css-color/5377c65022ee6d660b898bad954aeea73fa613b8/screenshot.png" width="763">
 </div>
 
 <sub>Inspired
