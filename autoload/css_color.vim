@@ -138,21 +138,17 @@ function! s:create_syn_match()
 	let rgb_color = get( s:pattern_color, pattern, '' )
 
 	if ! strlen( rgb_color )
-		let hexcolor = submatch(1)
+		let hex = submatch(1)
 		let funcname = submatch(2)
 
-		if funcname == 'rgb'
-			let rgb_color = s:rgb2color(submatch(3),submatch(4),submatch(5))
-		elseif funcname == 'hsl'
-			let rgb_color = s:hsl2color(submatch(3),submatch(4),submatch(5))
-		elseif strlen(hexcolor) == 6
-			let rgb_color = tolower(hexcolor)
-		elseif strlen(hexcolor) == 3
-			let rgb_color = substitute(tolower(hexcolor), '\(.\)', '\1\1', 'g')
-		else
-			throw 'css_color: create_syn_match invoked on bad match data'
-		endif
+		let rgb_color
+			\ = funcname == 'rgb' ? s:rgb2color(submatch(3),submatch(4),submatch(5))
+			\ : funcname == 'hsl' ? s:hsl2color(submatch(3),submatch(4),submatch(5))
+			\ : strlen(hex) == 6  ? tolower(hex)
+			\ : strlen(hex) == 3  ? tolower(hex[0].hex[0].hex[1].hex[1].hex[2].hex[2])
+			\ : ''
 
+		if rgb_color == '' | throw 'css_color: create_syn_match invoked on bad match data' | endif
 		let s:pattern_color[pattern] = rgb_color
 	endif
 
@@ -202,7 +198,7 @@ function! s:create_matches()
 	endfor
 endfunction
 
-let s:_hexcolor   = '#\(\x\{3}\|\x\{6}\)\>' " submatch 1
+let s:_hexcolor   = '#\(\x\{3}\%(\>\|\x\{3}\>\)\)' " submatch 1
 let s:_funcname   = '\(rgb\|hsl\)a\?' " submatch 2
 let s:_ws_        = '\s*'
 let s:_numval     = s:_ws_ . '\(\d\{1,3}%\?\)' " submatch 3,4,5
