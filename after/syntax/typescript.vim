@@ -1,6 +1,6 @@
+" https://github.com/HerringtonDarkholme/yats.vim (stock Vim syntax)
 " https://github.com/leafgarland/typescript-vim
-" should already be including the xml syntax
-call css_color#init('hex', 'extended'
- \, 'typescriptComment,typescriptLineComment,typescriptStringS,typescriptStringD,'
- \. 'typescriptStringB,typescriptCommentSkip,typescriptDocComment'
+call css_color#init('css', 'extended'
+ \, 'typescriptString,typescriptStringProperty,typescriptStringS,typescriptStringD,typescriptStringB,'
+ \. 'typescriptComment,typescriptLineComment,typescriptCommentSkip,typescriptDocComment'
  \)
