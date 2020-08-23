@@ -1,1 +1,1 @@
-call css_color#init('css', 'extended', 'cssMediaBlock,cssFunction,cssDefinition,cssAttrRegion,cssComment')
+call css_color#init('css', 'extended', 'cssIdentifier,cssMediaBlock,cssFunction,cssDefinition,cssAttrRegion,cssComment')
