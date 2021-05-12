@@ -38,6 +38,43 @@ function! s:hsl2color(h,s,l)
 	return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
 endfunction
 
+const s:_1_3 = 1.0/3
+const s:_16_116 = 16.0/116.0
+const s:cos16 = cos(16*(180/atan2(0,-1)))
+const s:sin16 = sin(16*(180/atan2(0,-1)))
+
+function s:rgb2din99(rgb)
+	let [r,g,b] = map( copy(a:rgb), 'v:val > 0.04045 ? pow((v:val + 0.055) / 1.055, 2.4) : v:val / 12.92' )
+
+	let x = r * 0.4124 + g * 0.3576 + b * 0.1805
+	let y = r * 0.2126 + g * 0.7152 + b * 0.0722
+	let z = r * 0.0193 + g * 0.1192 + b * 0.9505
+
+	" Observer 2°, Illuminant D65
+	let x = ( x * 100 ) /  95.0489
+	let z = ( z * 100 ) / 108.8840
+
+	let [x,y,z] = map( [x,y,z], 'v:val > 0.008856 ? pow(v:val, s:_1_3) : 7.787 * v:val + s:_16_116' )
+
+	let [L,a,b] = [ (116 * y) - 16, 500 * (x - y), 200 * (y - z) ]
+
+	let L99 = 105.51 * log(1 + 0.0158 * L)
+
+	let e =        a * s:cos16 + b * s:sin16
+	let f = 0.7 * (b * s:cos16 - a * s:sin16)
+
+	let g = 0.045 * sqrt(e*e + f*f)
+	if g == 0
+		let [a99, b99] = [0.0, 0.0]
+	else
+		let k = log(1 + g) / g
+		let a99 = k * e
+		let b99 = k * f
+	endif
+
+	return [L99, a99, b99]
+endfunction
+
 let s:hex={}
 for i in range(0, 255)
 	let s:hex[ printf( '%02x', i ) ] = i
@@ -86,6 +123,10 @@ else
 	" grayscale ramp
 	let s:xtermcolor += map( range(24), 'repeat( [10 * v:val + 8], 3 )' )
 
+	for idx in range(len(s:xtermcolor))
+		let s:xtermcolor[idx] = s:rgb2din99( map(s:xtermcolor[idx], 'v:val / 255.0') )
+	endfor
+
 	" selects the nearest xterm color for a rgb value like #FF0000
 	function! s:rgb2xterm(color)
 		let best_match=0
@@ -95,12 +136,14 @@ else
 		let g = s:hex[color[2:3]]
 		let b = s:hex[color[4:5]]
 
+		let [L1,a1,b1] = s:rgb2din99([ r/255.0, g/255.0, b/255.0 ])
+
 		for idx in range(len(s:xtermcolor))
-			let [tr,tg,tb] = s:xtermcolor[idx]
-			let dr = tr - r
-			let dg = tg - g
-			let db = tb - b
-			let distance = dr*dr + dg*dg + db*db
+			let [L2,a2,b2] = s:xtermcolor[idx]
+			let dL = L1 - L2
+			let da = a1 - a2
+			let db = b1 - b2
+			let distance = dL*dL + da*da + db*db
 			if distance == 0 | return idx | endif
 			if distance > smallest_distance | continue | endif
 			let smallest_distance = distance
