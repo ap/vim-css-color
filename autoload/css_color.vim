@@ -43,9 +43,14 @@ for i in range(0, 255)
 	let s:hex[ printf( '%02x', i ) ] = i
 endfor
 
+let s:exe=[]
+function! s:flush_exe()
+	if len(s:exe) | exe join( remove( s:exe, 0, -1 ), ' | ' ) | endif
+endfunction
+
 if has('gui_running')
 	function! s:create_highlight(color, is_bright)
-		exe 'hi BG'.a:color 'guibg=#'.a:color 'guifg=#'.( a:is_bright ? '000000' : 'ffffff' )
+		call add( s:exe, 'hi BG'.a:color.' guibg=#'.a:color.' guifg=#'.( a:is_bright ? '000000' : 'ffffff' ) )
 	endfunction
 else
 	" preset 16 vt100 colors
@@ -121,8 +126,11 @@ else
 			let color_idx = s:rgb2xterm(a:color)
 			let s:color_idx[a:color] = color_idx
 		endif
-		exe 'hi BG'.a:color 'ctermbg='.color_idx 'ctermfg='.( a:is_bright ? 0 : 15 )
-		\                    'guibg=#'.a:color    'guifg=#'.( a:is_bright ? '000000' : 'ffffff' )
+		call add( s:exe,
+			\   'hi BG'.a:color
+			\ . ' guibg=#' .a:color  .' guifg=#' .( a:is_bright ? '000000' : 'ffffff' )
+			\ . ' ctermbg='.color_idx.' ctermfg='.( a:is_bright ? 0 : 15 )
+			\ )
 	endfunction
 endif
 
@@ -168,7 +176,7 @@ function! s:create_syn_match()
 
 	" iff pattern ends on word character, require word break to match
 	if pattern =~ '\>$' | let pattern .= '\>' | endif
-	exe 'syn match BG'.rgb_color.' /'.escape(pattern, '/').'/ contained containedin=@colorableGroup'
+	call add( s:exe, 'syn match BG'.rgb_color.' /'.escape(pattern, '/').'/ contained containedin=@colorableGroup' )
 
 	return ''
 endfunction
@@ -219,12 +227,14 @@ function! s:parse_screen()
 	let left = max([ leftcol - 15, 0 ])
 	let width = &columns * 4
 	call filter( range( line('w0'), line('w$') ), 'substitute( strpart( getline(v:val), col([v:val, left]), width ), b:css_color_pat, ''\=s:create_syn_match()'', ''g'' )' )
+	call s:flush_exe()
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 function! css_color#reinit()
 	call filter( keys( b:css_color_hi ), 's:create_highlight( v:val, s:color_bright[v:val] )' )
+	call s:flush_exe()
 endfunction
 
 function! css_color#enable()
