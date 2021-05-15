@@ -75,19 +75,13 @@ else
 	" the 6 values used in the xterm color cube
 	"                    0    95   135   175   215   255
 	let s:cubergb = [ 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF ]
-
-	" 0..255 mapped to 0..5 based on the color cube values
-	let s:xvquant = repeat([0],48)
-				\ + repeat([1],68)
-				\ + repeat([2],40)
-				\ + repeat([3],40)
-				\ + repeat([4],40)
-				\ + repeat([5],20)
-	" tweak the mapping for the exact matches (0 and 1 already correct)
-	let s:xvquant[s:cubergb[2]] = 2
-	let s:xvquant[s:cubergb[3]] = 3
-	let s:xvquant[s:cubergb[4]] = 4
-	let s:xvquant[s:cubergb[5]] = 5
+	for s:rrr in s:cubergb
+		for s:ggg in s:cubergb
+			for s:bbb in s:cubergb
+				call add( s:xtermcolor, [ s:rrr, s:ggg, s:bbb, len(s:xtermcolor) ] )
+			endfor
+		endfor
+	endfor
 
 	" grayscale ramp
 	let s:xtermcolor += map(range(24),'repeat([10*v:val+8],3) + [v:val+232]')
@@ -101,13 +95,7 @@ else
 		let g = s:hex[color[2:3]]
 		let b = s:hex[color[4:5]]
 
-		let vr = s:xvquant[r]
-		let vg = s:xvquant[g]
-		let vb = s:xvquant[b]
-		let cidx = vr * 36 + vg * 6 + vb + 16
-		let ccol = [ s:cubergb[vr], s:cubergb[vg], s:cubergb[vb], cidx ]
-
-		for [tr,tg,tb,idx] in [ ccol ] + s:xtermcolor
+		for [tr,tg,tb,idx] in s:xtermcolor
 			let dr = tr - r
 			let dg = tg - g
 			let db = tb - b
