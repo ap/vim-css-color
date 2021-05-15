@@ -71,8 +71,6 @@ else
 		\ [ 0xFF, 0x00, 0xFF, 13 ],
 		\ [ 0x00, 0xFF, 0xFF, 14 ],
 		\ [ 0xFF, 0xFF, 0xFF, 15 ]]
-	" grayscale ramp
-	let s:xtermcolor += map(range(24),'repeat([10*v:val+8],3) + [v:val+232]')
 
 	" the 6 values used in the xterm color cube
 	"                    0    95   135   175   215   255
@@ -90,6 +88,9 @@ else
 	let s:xvquant[s:cubergb[3]] = 3
 	let s:xvquant[s:cubergb[4]] = 4
 	let s:xvquant[s:cubergb[5]] = 5
+
+	" grayscale ramp
+	let s:xtermcolor += map(range(24),'repeat([10*v:val+8],3) + [v:val+232]')
 
 	" selects the nearest xterm color for a rgb value like #FF0000
 	function! s:rgb2xterm(color)
