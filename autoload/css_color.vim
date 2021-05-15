@@ -124,6 +124,10 @@ else
 	endfunction
 endif
 
+function! s:recreate_highlights()
+	call filter( copy( b:css_color_hi ), 's:create_highlight( v:key, v:val )' )
+endfunction
+
 let s:pattern_color = {}
 let s:color_bright  = {}
 function! s:create_syn_match()
@@ -223,7 +227,7 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 function! css_color#reinit()
-	call filter( keys( b:css_color_hi ), 's:create_highlight( v:val, s:color_bright[v:val] )' )
+	call s:recreate_highlights()
 	call s:flush_exe()
 endfunction
 
@@ -277,4 +281,13 @@ function! css_color#init(type, keywords, groups)
 		exe 'syntax include syntax/colornames/'.a:keywords.'.vim'
 		call extend( s:color_bright, b:css_color_hi )
 	endif
+endfunction
+
+" utility function for development use
+function! css_color#dump_highlights()
+	call s:recreate_highlights()
+	let cmd = join( sort( remove( s:exe, 0, -1 ) ),  "\n" )
+	let cmd = substitute( cmd, '#......', '\U&', 'g' )
+	let cmd = substitute( cmd, 'ctermbg=\zs\d\+', '\=printf("%-3d",submatch(0))', 'g' )
+	return cmd
 endfunction
