@@ -32,6 +32,7 @@ hi BG4b0082 guibg=#4B0082 guifg=#FFFFFF ctermbg=54  ctermfg=15
 hi BG556b2f guibg=#556B2F guifg=#FFFFFF ctermbg=58  ctermfg=15
 hi BG5f9ea0 guibg=#5F9EA0 guifg=#000000 ctermbg=73  ctermfg=0
 hi BG6495ed guibg=#6495ED guifg=#000000 ctermbg=68  ctermfg=0
+hi BG663399 guibg=#663399 guifg=#FFFFFF ctermbg=91  ctermfg=15
 hi BG66cdaa guibg=#66CDAA guifg=#000000 ctermbg=79  ctermfg=0
 hi BG696969 guibg=#696969 guifg=#FFFFFF ctermbg=242 ctermfg=15
 hi BG6a5acd guibg=#6A5ACD guifg=#FFFFFF ctermbg=62  ctermfg=15
@@ -265,6 +266,7 @@ syn keyword BGdda0dd Plum                 contained containedin=@colorableGroup
 syn keyword BGb0e0e6 PowderBlue           contained containedin=@colorableGroup
 syn keyword BGbc8f8f RosyBrown            contained containedin=@colorableGroup
 syn keyword BG4169e1 RoyalBlue            contained containedin=@colorableGroup
+syn keyword BG663399 RebeccaPurple        contained containedin=@colorableGroup
 syn keyword BG8b4513 SaddleBrown          contained containedin=@colorableGroup
 syn keyword BGfa8072 Salmon               contained containedin=@colorableGroup
 syn keyword BGf4a460 SandyBrown           contained containedin=@colorableGroup
