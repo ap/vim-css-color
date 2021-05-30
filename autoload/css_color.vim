@@ -38,10 +38,10 @@ function! s:hsl2color(h,s,l)
 	return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
 endfunction
 
-const s:_1_3 = 1.0/3
-const s:_16_116 = 16.0/116.0
-const s:cos16 = cos(16*(180/atan2(0,-1)))
-const s:sin16 = sin(16*(180/atan2(0,-1)))
+let s:_1_3 = 1.0/3
+let s:_16_116 = 16.0/116.0
+let s:cos16 = cos(16*(180/atan2(0,-1)))
+let s:sin16 = sin(16*(180/atan2(0,-1)))
 
 function s:rgb2din99(rgb)
 	let [r,g,b] = map( copy(a:rgb), 'v:val > 0.04045 ? pow((v:val + 0.055) / 1.055, 2.4) : v:val / 12.92' )
