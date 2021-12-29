@@ -1,0 +1,1 @@
+call css_color#init('css', 'extended', 'rasiHexColor,rasiRGBColor,rasiRGBAColor,rasiHSLColor,rasiHSLAColor,rasiCMYKColor,rasiNamedColor,rasiPropertyVal,rasiComment,rasiCommentL,rasiEnvVar,rasiVarReference')
