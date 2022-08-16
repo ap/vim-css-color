@@ -11,17 +11,31 @@ if ! ( v:version >= 700 && has('syntax') && ( has('gui_running') || has('nvim') 
 	finish
 endif
 
-function! s:rgb2color(r,g,b)
+" (v = value, u = unit)
+function! s:rgb2color(rv,ru,gv,gu,bv,bu)
 	" Convert 80% -> 204, 100% -> 255, etc.
-	let rgb = map( [a:r,a:g,a:b], 'v:val =~ "%$" ? ( 255 * v:val ) / 100 : v:val' )
-	return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
+	return printf('%02x%02x%02x',
+				\ a:ru == "%" ? a:rv * 255 : a:rv,
+				\ a:gu == "%" ? a:gv * 255 : a:gv,
+				\ a:bu == "%" ? a:bv * 255 : a:bv)
 endfunction
 
-function! s:hsl2color(h,s,l)
+function! s:hsl2color(hv,hu,sv,su,lv,lu)
 	" Convert 80% -> 0.8, 100% -> 1.0, etc.
-	let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : v:val + 0.0' )
+	let s = a:su == "%" ? str2float(a:sv) / 100.0 : str2float(a:sv)
+	let l = a:lu == "%" ? str2float(a:lv) / 100.0 : str2float(a:lv)
+	" Units: convert turn, grad, rad, assume anything else is unitless or deg.
+	let hh = str2float(a:hv) / (
+		\ a:hu == "turn" ? 1.0 :
+		\ a:hu == "grad" ? 400.0 :
+		\ a:hu == "rad" ? 6.283185307179586 :
+		\ 360.0
+		\ )
+	" Get the floored remainder, so negative values work correctly.
+	" (Can’t use % with floats, and it’s truncated modulo anyway.)
+	let hh = hh < 0 ? hh - float2nr(hh) + 1 : hh - float2nr(hh)
+	" Now hh is in the range [0, 1), as required.
 	" algorithm transcoded to vim from http://www.w3.org/TR/css3-color/#hsl-color
-	let hh = ( a:h % 360 ) / 360.0
 	let m2 = l <= 0.5 ? l * ( s + 1 ) : l + s - l * s
 	let m1 = l * 2 - m2
 	let rgb = []
@@ -187,8 +201,8 @@ function! s:create_syn_match()
 		let funcname = submatch(2)
 
 		let rgb_color
-			\ = funcname == 'rgb' ? s:rgb2color(submatch(3),submatch(4),submatch(5))
-			\ : funcname == 'hsl' ? s:hsl2color(submatch(3),submatch(4),submatch(5))
+			\ = funcname == 'rgb' ? s:rgb2color(submatch(3),submatch(4),submatch(5),submatch(6),submatch(7),submatch(8))
+			\ : funcname == 'hsl' ? s:hsl2color(submatch(3),submatch(4),submatch(5),submatch(6),submatch(7),submatch(8))
 			\ : strlen(hex) >= 6  ? tolower(hex[0:5])
 			\ : strlen(hex) >= 3  ? tolower(hex[0].hex[0].hex[1].hex[1].hex[2].hex[2])
 			\ : ''
@@ -247,9 +261,9 @@ let s:_hexcolor   = '#\(\x\{3}\%(\>\|\x\{3}\>\)\)' " submatch 1
 let s:_rgbacolor  = '#\(\x\{3}\%(\>\|\x\%(\>\|\x\{2}\%(\>\|\x\{2}\>\)\)\)\)' " submatch 1
 let s:_funcname   = '\(rgb\|hsl\)a\?' " submatch 2
 let s:_ws_        = '\s*'
-let s:_numval     = s:_ws_ . '\(\d\{1,3}%\?\)' " submatch 3,4,5
-let s:_listsep    = s:_ws_ . ','
-let s:_otherargs_ = '\%(,[^)]*\)\?'
+let s:_numval     = s:_ws_ . '\(-\?\%(\d\+\%(\.\d\+\)\?\|\.\d\+\)\)\(%\|deg\|grad\|rad\|turn\)\?' " submatch 3,4,5,6,7,8
+let s:_listsep    = '\%(\s*,\|\s\+\)'
+let s:_otherargs_ = '\%([,/][^)]*\)\?'
 let s:_funcexpr   = s:_funcname . '[(]' . s:_numval . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_ws_ . s:_otherargs_ . '[)]'
 let s:_csscolor   = s:_rgbacolor . '\|' . s:_funcexpr
 " N.B. sloppy heuristic constants for performance reasons:
