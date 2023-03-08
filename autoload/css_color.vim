@@ -90,24 +90,8 @@ if has('gui_running')
 		call add( s:exe, 'hi BG'.a:color.' guibg=#'.a:color.' guifg=#'.( a:is_bright ? '000000' : 'ffffff' ) )
 	endfunction
 else
-	" preset 16 vt100 colors
-	let s:xtermcolor = [
-		\ [ 0x00, 0x00, 0x00 ],
-		\ [ 0xCD, 0x00, 0x00 ],
-		\ [ 0x00, 0xCD, 0x00 ],
-		\ [ 0xCD, 0xCD, 0x00 ],
-		\ [ 0x00, 0x00, 0xEE ],
-		\ [ 0xCD, 0x00, 0xCD ],
-		\ [ 0x00, 0xCD, 0xCD ],
-		\ [ 0xE5, 0xE5, 0xE5 ],
-		\ [ 0x7F, 0x7F, 0x7F ],
-		\ [ 0xFF, 0x00, 0x00 ],
-		\ [ 0x00, 0xFF, 0x00 ],
-		\ [ 0xFF, 0xFF, 0x00 ],
-		\ [ 0x5C, 0x5C, 0xFF ],
-		\ [ 0xFF, 0x00, 0xFF ],
-		\ [ 0x00, 0xFF, 0xFF ],
-		\ [ 0xFF, 0xFF, 0xFF ]]
+	" the 16 vt100 colors are not defined consistently
+	let s:xtermcolor = repeat( [''], 16 )
 
 	" the 6 values used in the xterm color cube
 	"                    0    95   135   175   215   255
@@ -123,7 +107,7 @@ else
 	" grayscale ramp
 	let s:xtermcolor += map( range(24), 'repeat( [10 * v:val + 8], 3 )' )
 
-	for idx in range(len(s:xtermcolor))
+	for idx in range( 16, len(s:xtermcolor) - 1 )
 		let s:xtermcolor[idx] = s:rgb2din99( map(s:xtermcolor[idx], 'v:val / 255.0') )
 	endfor
 
@@ -138,7 +122,7 @@ else
 
 		let [L1,a1,b1] = s:rgb2din99([ r/255.0, g/255.0, b/255.0 ])
 
-		for idx in range(len(s:xtermcolor))
+		for idx in range( 16, len(s:xtermcolor) - 1 )
 			let [L2,a2,b2] = s:xtermcolor[idx]
 			let dL = L1 - L2
 			let da = a1 - a2
