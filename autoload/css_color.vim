@@ -230,11 +230,13 @@ endfunction
 let s:_hexcolor   = '#\(\x\{3}\%(\>\|\x\{3}\>\)\)' " submatch 1
 let s:_rgbacolor  = '#\(\x\{3}\%(\>\|\x\%(\>\|\x\{2}\%(\>\|\x\{2}\>\)\)\)\)' " submatch 1
 let s:_funcname   = '\(rgb\|hsl\)a\?' " submatch 2
+let s:_funcprep   = '\%(\s*\S\+\%(\%(\s\+\S\+\)\{2}\|\%(\s*,\s*\S\+\)\{2}\)\)\@=' " lookahead for 12,34,56 vs 12 34 56 to avoid 12 34,56
 let s:_ws_        = '\s*'
-let s:_numval     = s:_ws_ . '\([0-9]\{1,2}%\|100%\|1\?[0-9]\{1,2}\|2[0-4][0-9]\|25[0-5]\)' " submatch 3,4,5
-let s:_listsep    = s:_ws_ . ','
-let s:_otherargs_ = '\%(,[^)]*\)\?'
-let s:_funcexpr   = s:_funcname . '[(]' . s:_numval . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_ws_ . s:_otherargs_ . '[)]'
+"let s:_numval     = '\(\d\{1,3}\%(\.\d*\)\?%\?\)' " submatch 3,4,5 (use this after implementing ceilings for the output of b:css_color_pat)
+let s:_numval     = '\(\d\{1,2}\%(\.\d*\)\?%\|100%\|255\|\%(1\?\d\{1,2}\|2[0-4]\d\|25[0-5]\)\%(\.\d*\)\?\)' " submatch 3,4,5
+let s:_listsep    = s:_ws_ . '[,[:space:]]\+'
+let s:_otherargs_ = s:_ws_ . '\%([,\/][^)]*\)\?' " ignore alpha
+let s:_funcexpr   = s:_funcname . '[(]' . s:_funcprep . s:_ws_ . s:_numval . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_otherargs_ . '[)]'
 let s:_csscolor   = s:_rgbacolor . '\|' . s:_funcexpr
 " N.B. sloppy heuristic constants for performance reasons:
 "      a) start somewhere left of screen in case of partially visible colorref
