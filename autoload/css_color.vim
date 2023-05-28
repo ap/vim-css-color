@@ -11,17 +11,56 @@ if ! ( v:version >= 700 && has('syntax') && ( has('gui_running') || has('nvim') 
 	finish
 endif
 
-function! s:rgb2color(r,g,b)
-	" Convert 80% -> 204, 100% -> 255, etc.
-	let rgb = map( [a:r,a:g,a:b], 'v:val =~ "%$" ? ( 255 * v:val ) / 100 : v:val' )
-	return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
+let s:_invalid = -9999 " used after bounding/wrapping, so this is safe
+
+function! s:bound(n, min, max)
+	let n = a:n
+	if     n < a:min | let n = a:min
+	elseif n > a:max | let n = a:max | endif
+	return str2nr( string(n + 0.5) )
 endfunction
 
-function! s:hsl2color(h,s,l)
-	" Convert 80% -> 0.8, 100% -> 1.0, etc.
-	let [s,l] = map( [a:s, a:l], 'v:val =~ "%$" ? v:val / 100.0 : v:val + 0.0' )
+function! s:rgb2hex(r, g, b)
+	let [r,g,b] = map( [a:r,a:g,a:b], 's:bound(v:val, 0, 255)' )
+	return printf( '%02x%02x%02x', r, g, b )
+endfunction
+
+function! s:rgb2color(r,g,b)
+	" Convert 35.6% -> 90.78, 80% -> 204, 100% -> 255, etc.
+	let [r,g,b] = map( [a:r,a:g,a:b], 'v:val =~ "%$" ? str2float(v:val) * 2.55 : str2float(v:val)' )
+	return s:rgb2hex(r, g, b)
+endfunction
+
+" Vimscript modulo can't handle decimals. Fix that.
+function! s:modulo(a, b)
+	let num = str2nr( string(a:a) )
+	let extra = a:a - num
+	return str2nr(a:a - extra) % a:b + extra
+endfunction
+
+function! s:angle2deg(angle, units)
+	let deg = str2float(a:angle)
+	" angles: https://developer.mozilla.org/en-US/docs/Web/CSS/angle
+	if a:units == "rad"
+		let deg = deg * 57.29577951308232  " deg = rad * 180 / pi, 360deg == 6.2832rad
+	elseif a:units == "grad"
+		let deg = deg * 0.9                " 360deg = 400grad
+	elseif a:units == "turn"
+		let deg = deg * 360.0              " 360deg = 1turn
+	elseif a:units != "" && a:units != "deg"
+		return s:_invalid                  " percent is invalid here
+	endif
+	let deg = s:modulo(deg, 360)
+	if deg < 0 | let deg = deg + 360 | endif
+	return deg
+endfunction
+
+function! s:hsl2rgb(h,u,s,l)
+	let [s,l] = map( [a:s, a:l], 'str2nr(v:val) >= 1 ? 1.0 : str2float(v:val)' )
 	" algorithm transcoded to vim from http://www.w3.org/TR/css3-color/#hsl-color
-	let hh = ( a:h % 360 ) / 360.0
+	let hh = s:angle2deg(a:h, a:u)
+	if hh == s:_invalid | return [hh,hh,hh] | endif
+	let hh = hh / 360.0
 	let m2 = l <= 0.5 ? l * ( s + 1 ) : l + s - l * s
 	let m1 = l * 2 - m2
 	let rgb = []
@@ -32,11 +71,47 @@ function! s:hsl2color(h,s,l)
 			\ h * 2 < 1 ? m2 :
 			\ h * 3 < 2 ? m1 + ( m2 - m1 ) * ( 2/3.0 - h ) * 6 :
 			\ m1
-		if v > 1.0 | return '' | endif
+		if v > 1.0 | return [s:_invalid, s:_invalid, s:_invalid] | endif
 		let rgb += [ float2nr( 255 * v ) ]
 	endfor
-	return printf( '%02x%02x%02x', rgb[0], rgb[1], rgb[2] )
+	return rgb
 endfunction
+
+function! s:pctvet(h,s,l)
+	" hue cannot be a percent, the others must be percents. same with hwb
+	if a:h =~ "%$" || a:s !~ "%$" || a:l !~ "%$"
+		return [s:_invalid, s:_invalid, s:_invalid]
+	endif
+	let [s,l] = map( [a:s, a:l], 'v:val >= 100 ? 1.0 : v:val / 100.0' )
+	return [a:h, s, l]
+endfunction
+
+function! s:hsl2color(h,u,s,l)
+	let [h,s,l] = s:pctvet(a:h, a:s, a:l) " convert saturation & luminance % -> num
+	if h == s:_invalid | return '' | endif
+	let [r,g,b] = s:hsl2rgb(h, a:u, s, l)
+	if r == s:_invalid | return '' | endif
+	return s:rgb2hex(r, g, b)
+endfunction
+
+function! s:hwb2color(h,u,w,b)
+	let [h,w,b] = s:pctvet(a:h, a:w, a:b) " convert whiteness & blackness % -> num
+	if h == s:_invalid | return '' | endif
+	" algorithm transcoded to vim from https://drafts.csswg.org/css-color/#hwb-to-rgb
+	if w + b >= 1
+		let gray = w / (w + b)
+		let [r,g,b] = [gray,gray,gray]
+	else
+		let [r,g,b] = map( s:hsl2rgb(a:h, a:u, 1.0, 0.5), 'v:val * (1 - w - b) + w' )
+	endif
+	return s:rgb2hex(r, g, b)
+endfunction
+
+" TODO (probably not): new "device-independent colors":
+" lch(), oklch(), lab(), oklab(), and color().
+" These look hard and I don't see reference algorithms to convert to sRGB.
+" https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
+" https://drafts.csswg.org/css-color/#lab-colors
 
 let s:_1_3 = 1.0/3
 let s:_16_116 = 16.0/116.0
@@ -170,14 +245,17 @@ function! s:create_syn_match()
 		let hex = submatch(1)
 		let funcname = submatch(2)
 
+		if funcname =~ 'rgb' && submatch(4) != '' | return '' | endif " rgb() doesn't support units
+
 		let rgb_color
-			\ = funcname == 'rgb' ? s:rgb2color(submatch(3),submatch(4),submatch(5))
-			\ : funcname == 'hsl' ? s:hsl2color(submatch(3),submatch(4),submatch(5))
+			\ = funcname =~ '^rgb' ? s:rgb2color(submatch(3),submatch(5),submatch(6))
+			\ : funcname =~ '^hsl' ? s:hsl2color(submatch(3),submatch(4),submatch(5),submatch(6))
+			\ : funcname == 'hwb' ? s:hwb2color(submatch(3),submatch(4),submatch(5),submatch(6))
 			\ : strlen(hex) >= 6  ? tolower(hex[0:5])
 			\ : strlen(hex) >= 3  ? tolower(hex[0].hex[0].hex[1].hex[1].hex[2].hex[2])
 			\ : ''
 
-		if rgb_color == '' | throw 'css_color: create_syn_match invoked on bad match data' | endif
+		if rgb_color == '' | return '' | endif
 		let s:pattern_color[pattern] = rgb_color
 	endif
 
@@ -229,14 +307,14 @@ endfunction
 
 let s:_hexcolor   = '#\(\x\{3}\%(\>\|\x\{3}\>\)\)' " submatch 1
 let s:_rgbacolor  = '#\(\x\{3}\%(\>\|\x\%(\>\|\x\{2}\%(\>\|\x\{2}\>\)\)\)\)' " submatch 1
-let s:_funcname   = '\(rgb\|hsl\)a\?' " submatch 2
-let s:_funcprep   = '\%(\s*\S\+\%(\%(\s\+\S\+\)\{2}\|\%(\s*,\s*\S\+\)\{2}\)\)\@=' " lookahead for 12,34,56 vs 12 34 56 to avoid 12 34,56
+let s:_funcname   = '\(rgb\a\?\|hsla\?\|hwb\)' " submatch 2
+let s:_consistent = '\%(\%(\s\+[0-9.%]\+\)\{2}\s*\%(\/\s*[-0-9.%]\+\)\?[)]\|\%(\s*,\s*[-0-9.%]\+\)\{2,3}[)]\)\@=' " lookahead: 1 2 3 or 1 2 3/4 or 1,2,3 or 1,2,3,4 after 1
 let s:_ws_        = '\s*'
-"let s:_numval     = '\(\d\{1,3}\%(\.\d*\)\?%\?\)' " submatch 3,4,5 (use this after implementing ceilings for the output of b:css_color_pat)
-let s:_numval     = '\(\d\{1,2}\%(\.\d*\)\?%\|100%\|255\|\%(1\?\d\{1,2}\|2[0-4]\d\|25[0-5]\)\%(\.\d*\)\?\)' " submatch 3,4,5
+let s:_numval     = '\(-\?\d\{1,3}\%(\.\d*\)\?%\?\)' " submatch 3,5,6
+let s:_units      = '\(deg\|g\?rad\|turn\)\?' " submatch 4
 let s:_listsep    = s:_ws_ . '[,[:space:]]\+'
 let s:_otherargs_ = s:_ws_ . '\%([,\/][^)]*\)\?' " ignore alpha
-let s:_funcexpr   = s:_funcname . '[(]' . s:_funcprep . s:_ws_ . s:_numval . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_otherargs_ . '[)]'
+let s:_funcexpr   = s:_funcname . '[(]' . s:_ws_ . s:_numval . s:_units . s:_consistent . s:_listsep . s:_numval . s:_listsep . s:_numval . s:_otherargs_ . '[)]'
 let s:_csscolor   = s:_rgbacolor . '\|' . s:_funcexpr
 " N.B. sloppy heuristic constants for performance reasons:
 "      a) start somewhere left of screen in case of partially visible colorref
