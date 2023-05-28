@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e
 s=startuptime.txt
-vim --startuptime $s -o -c qa "$@"
-awk '/\/after\/syntax\/css\.vim$/ {sum += $2} END {print sum}' $s
-rm $s
+[ $# = 0 ] && set -- *.*  # default to all files with a dot
+[ $# -gt 1 ] && multi=1 || multi=
+for sample in "$@"; do
+  vim --startuptime $s -c qa "$sample"
+  run=$(awk '/\/after\/syntax\/css\.vim$/ {sum += $2} END {print sum}' "$s")
+  rm $s
+  echo "$run${multi:+\t$sample}"
+  total=$(echo "${total:-0} + ${run:-0}" |bc -ql)
+done
+[ -n "$multi" ] && echo "$total\t(total)"
