@@ -78,7 +78,7 @@ function! s:hsl2rgb(h,u,s,l)
 endfunction
 
 function! s:pctvet(h,s,l)
-	" hue cannot be a percent, the others must be percents. same with hwb
+	" for hsl & hwb, hue cannot be a percent, the others must be percents.
 	if a:h =~ "%$" || a:s !~ "%$" || a:l !~ "%$"
 		return [s:_invalid, s:_invalid, s:_invalid]
 	endif
