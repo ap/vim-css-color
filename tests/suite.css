@@ -48,10 +48,6 @@ u.round3 { color: hsl(180 65% 29%) }		/* should be #197a7a */
 
 /* #123456 */
 
-.do_color_me::after { color: rgb(123, 234, 0) }
-
-ul { color: white; }
-
 td { border: solid red 4px; }
 td { border: solid #f00d 4px; }
 
@@ -78,12 +74,16 @@ a.c { color: hwb(90deg 10% 10%); }
 a.d { color: hwb(1.5708rad 10% 10%); }
 a.e { color: hwb(0.25turn 10% 10% / 50%); }
 
-q { border-color: tan; }
+.do_color_me::after { color: rgb(123, 234, 0) }
+q.tan { border-color: tan; }
+q.white { border-color: white; }
+q.abcdef { border-color: #abcdef; }
 
 /* these should NOT be colored */
 .dont_color_me::after { content: "color: rgb(123, 234, 0)" }
-#abcdef { border-color: unset; }
 p.tan { color: inherit; width: calc(100px * tan(45deg)); }
+p.white { color: currentColor; white-space: inherit; }
+#abcdef { border-color: unset; }
 a.cs1 { color: rgb(0, 17, 136 / 100%); } /* you can't mix commas and slash */
 a.cs2 { color: rgb(0  17  136,  100%); } /* you can't mix spaces and commas */
 a.cs3 { color: rgb(0  17  136  1); } /* alpha with spaces must use slash */
