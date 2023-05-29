@@ -13,6 +13,10 @@ endif
 
 let s:_invalid = -9999 " used after bounding/wrapping, so this is safe
 
+" Add open-parens as a keyword char to avoid coloring function names like tan().
+" This is ... not advised; it's unclear what it might break
+"syn iskeyword @,40,48-57,_,192-255,-
+
 function! s:bound(n, min, max)
 	let n = a:n
 	if     n < a:min | let n = a:min
