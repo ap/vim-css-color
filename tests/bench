@@ -1,11 +1,12 @@
 #!/bin/sh
-set -e
 s=startuptime.txt
-[ $# = 0 ] && set -- *.*  # default to all files with a dot
+this=$(realpath "$0" 2>/dev/null || readlink -f "$0")
+[ $# = 0 ] && cd "${this%/*}" && set -- *.*  # default to all files with a dot
+target="${this%/tests/*}/after/syntax/css.vim"
 [ $# -gt 1 ] && multi=1 || multi=
 for sample in "$@"; do
   vim --startuptime $s -c qa "$sample"
-  run=$(awk '/\/after\/syntax\/css\.vim$/ {sum += $2} END {print sum}' "$s")
+  run=$(awk -v t="$target" 'index($0, t) {sum += $2} END {print sum}' "$s")
   rm $s
   echo "$run${multi:+\t$sample}"
   total="${total:-0} + ${run:-0}"
