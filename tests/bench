@@ -8,6 +8,7 @@ for sample in "$@"; do
   run=$(awk '/\/after\/syntax\/css\.vim$/ {sum += $2} END {print sum}' "$s")
   rm $s
   echo "$run${multi:+\t$sample}"
-  total=$(echo "${total:-0} + ${run:-0}" |bc -ql)
+  total="${total:-0} + ${run:-0}"
 done
-[ -n "$multi" ] && echo "$total\t(total)"
+# if multi, show the sum total. otherwise, return true only if we had a run.
+[ -n "$multi" ] && echo "$(echo "$total" |bc -ql)\t(total)" || [ -n "$run" ]
