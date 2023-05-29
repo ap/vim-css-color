@@ -32,7 +32,7 @@ syn case ignore
 syn keyword BG000000 black   contained containedin=@colorableGroup
 syn keyword BGc0c0c0 silver  contained containedin=@colorableGroup
 syn keyword BG808080 gray    contained containedin=@colorableGroup
-syn match   BGffffff "\c\<white\(-\)\@!\>" contained containedin=@colorableGroup
+syn keyword BGffffff white   contained containedin=@colorableGroup
 syn keyword BG800000 maroon  contained containedin=@colorableGroup
 syn keyword BGff0000 red     contained containedin=@colorableGroup
 syn keyword BG800080 purple  contained containedin=@colorableGroup
