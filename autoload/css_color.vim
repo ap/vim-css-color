@@ -81,9 +81,10 @@ function! s:hsl2rgb(h,u,s,l)
 	return rgb
 endfunction
 
+" vet hsl and hwb values
 function! s:pctvet(h,s,l)
-	" for hsl & hwb, hue cannot be a percent, the others must be percents.
-	if a:h =~ "%$" || a:s !~ "%$" || a:l !~ "%$"
+	" hue cannot be a percent, others must be percents (except for sass & scss)
+	if a:h =~ "%$" || b:current_syntax !~ "s[ac]ss$" && (a:s !~ "%$" || a:l !~ "%$")
 		return [s:_invalid, s:_invalid, s:_invalid]
 	endif
 	let [s,l] = map( [a:s, a:l], 'v:val >= 100 ? 1.0 : v:val / 100.0' )
