@@ -14,16 +14,16 @@ hi def link htmlCssQuote	htmlString
 
 " Legacy HTML 3-style color declarations (depcecated) {{{
 " Search https://www.w3.org/TR/html4/index/attributes.html for `%Color;`
-" Technically, these must be named or #RRGGBB, but both FF and Chrome simply
-" map it to CSS, supporting #RGB, #RGBA, and #RRGGBBAA (though alpha is ignored)
 syn region  htmlTag		start=+<\s*body\s+   end=+>+ fold contains=htmlTagN,htmlString,htmlArg,htmlValue,htmlTagError,htmlEvent,htmlCssDefinition,@htmlPreproc,@htmlArgCluster,htmlTagBodyColors
 syn keyword htmlTagBodyColors	contained nextgroup=htmlLegacyColor text bgcolor link alink vlink
 syn region  htmlTag		start=+<\s*\%(table\|t[rdh]\)\s+   end=+>+ fold contains=htmlTagN,htmlString,htmlArg,htmlValue,htmlTagError,htmlEvent,htmlCssDefinition,@htmlPreproc,@htmlArgCluster,htmlBgColors
 syn keyword htmlBgColors	contained nextgroup=htmlLegacyColor bgcolor
 syn region  htmlTag		start=+<\s*\%(base\)\?font\s+   end=+>+ fold contains=htmlTagN,htmlString,htmlArg,htmlValue,htmlTagError,htmlEvent,htmlCssDefinition,@htmlPreproc,@htmlArgCluster,htmlFgColors
 syn keyword htmlFgColors	contained nextgroup=htmlLegacyColor color
-syn region htmlLegacyColor	contained start=+="+ end=+"+ contains=cssColor
-syn region htmlLegacyColor	contained start=+='+ end=+'+ contains=cssColor
+" The spec only supports named colors & hash-prefixed RGB hex with 3 or 6 chars.
+" (Both FF & Chrome use IE's crazy "flex hex" formula to convert anything else to hex:
+" https://scrappy-do.blogspot.com/2004/08/little-rant-about-microsoft-internet.html -- we're NOT doing that.)
+syn match htmlLegacyColor	contained +=\(['"]\)\%(#\x\{3\}\%(\x\{3\}\)\?\|[A-Za-z]\+\)\1+ contains=cssColor
 
 hi def link htmlTagBody		htmlTagName
 hi def link htmlTagBodyColors	htmlArg
