@@ -1,1 +1,1 @@
-call css_color#init('hex', 'none', 'kittyColor,kittyComment')
+call css_color#init('hex', 'none', 'kittyComment,kittyColor')

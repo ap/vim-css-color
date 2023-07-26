@@ -1,1 +1,1 @@
-call css_color#init('css', 'extended', 'stylusCssAttribute,stylusComment,cssComment')
+call css_color#init('css', 'extended', 'stylusComment,cssComment,stylusCssAttribute')
