@@ -2,11 +2,13 @@ i { background: #359 }
 b { background: #335599 }
 u { background: rgba(144, 0, 0, .5) }
 s { background: hsl(0, 100%, 50%) }
+a { background: hsl(-12.3rad 45.6% 78.9% / 01.2%) }
 
 *::color1 { -x-: #359 }
 *::color2 { -x-: #335599 }
 *::color3 { -x-: rgba(144, 0, 0, .5) }
 *::color4 { -x-: hsl(0, 100%, 50%) }
+*::color5 { -x-: hsl(-12.3rad 45.6% 78.9% / 01.2%) }
 
 /*
  * #123, #456
