@@ -7,8 +7,7 @@ if &syntax =~# '\(^\|\.\)coffee\($\|\.\)' | finish | endif
 " javaScriptX = default Vim syntax
 " jsX         = https://github.com/pangloss/vim-javascript
 " javascriptX = https://github.com/othree/yajs.vim
-call css_color#init('hex', 'extended'
-	\,  'javaScriptComment,javaScriptLineComment,javaScriptStringS,javaScriptStringD,javaScriptStringT'
-	\. ',jsComment,jsString,jsTemplateString,jsObjectKeyString,jsObjectStringKey,jsClassStringKey'
-	\. ',javascriptComment,javascriptLineComment,javascriptLineComment,javascriptString,javascriptTemplate'
-	\)
+call css_color#init('hex', 'extended',
+	\ 'javaScriptComment,javaScriptLineComment,javaScriptStringS,javaScriptStringD,javaScriptStringT,' .
+	\ 'jsComment,jsString,jsTemplateString,jsObjectKeyString,jsObjectStringKey,jsClassStringKey,' .
+	\ 'javascriptComment,javascriptLineComment,javascriptLineComment,javascriptString,javascriptTemplate')
