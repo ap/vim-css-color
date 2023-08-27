@@ -1,1 +1,1 @@
-call css_color#init('css', 'none', 'tmuxString,tmuxComment')
+call css_color#init('css', 'none', 'tmuxComment,tmuxString')

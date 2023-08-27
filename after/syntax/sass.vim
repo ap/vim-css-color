@@ -1,1 +1,1 @@
-call css_color#init('css', 'extended', 'sassCssAttribute,sassComment,sassCssComment')
+call css_color#init('css', 'extended', 'sassComment,sassCssComment,sassCssAttribute')

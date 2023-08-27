@@ -1,1 +1,1 @@
-call css_color#init('css', 'extended', 'scssAttribute,scssComment,scssVariableValue,scssMap,scssMapValue,sassCssAttribute,cssComment')
+call css_color#init('css', 'extended', 'scssComment,cssComment,scssAttribute,scssVariableValue,scssMap,scssMapValue,sassCssAttribute')
