@@ -1,0 +1,102 @@
+/* see also https://developer.mozilla.org/en-US/docs/Web/CSS/color
+ * and https://www.w3schools.com/colors/colors_converter.asp */
+
+i { background: #359 }
+b { background: #335599 }
+u { color: #12345678; background: rgba(144, 0, 0, .5) }
+s { color: #1234; background: hsl(0, 100%, 50%) }
+p { color:rebeccapurple; background-color:rgb(222 255 202 / 0.2) }
+
+/* These are all pretty much the same color (barring rounding and alpha) */
+a.rgb  { color: rgb(0, 17, 136); } 	/* no alpha */
+a.rgb1 { color: rgb(0, 17, 136, 1); }	/* alpha but fully opaque */
+a.rgba { color: rgba(0, 17, 136, 1); }	/* explicit alpha but fully opaque */
+a.rgbp { color: rgb(0, 17, 136, 50%); }	/* half transparent (via percent) */
+a.rgb0 { color: rgb(0, 17, 136, 0.1); }	/* very transparent */
+a.rgbz { color: rgb(0, 17, 136, 0); }	/* fully transparent */
+a.sp   { color:rgb(0 , 17, 136,  0.3) }	/* extra spaces */
+a.rgbd { color: rgb(0, 16.99, 136); } 	/* CSS supports decimals! */
+a.cc{color:rgb(0,17,136,.3)}		/* compact with commas */
+a.cs{color:rgb(0 17 136/.3)}		/* compact with spaces and slash */
+a.h3   { color: #018; }			/* same color but in hex (3char) */
+a.h6   { color: #001188; }		/* same color but in hex (6char) */
+a.h8   { color: #001188ff; }		/* same color but in hex (8char) */
+a.hlcs { color:hsl(232.5 100% 27%); }	/* same color but hsl with spaces */
+a.hslc { color:hsl(232.5, 100%, 27%) }	/* same color but hsl, commas */
+a.hlca { color:hsl(232.5, 100%, 27%, 100%); }	/* same color but hsla */
+a.hwb  { color:hwb(232.5, 0%, 46.5%); }	/* same color but hwb */
+
+/* out of bounds but accepted by browsers */
+a.rgboob { color:rgb(0,17,256); }
+a.rgbaoob1 { color:rgb(0,17,255, 1.1); }
+a.rgbaoob2 { color:rgb(0,17,255, 2); }
+a.hsloob101 { color:hsl(256, 200%, 27%); }
+
+/* are we rounding too much? these should be different */
+u.round1 { color: rgb(10.9% 123 122.5) }	/* should be #1c7b7b */
+u.round2 { color: rgb(10.0% 123 123.4) }	/* should be #1a7b7b */
+u.round3 { color: hsl(180 65% 29%) }		/* should be #197a7a */
+
+*::color1 { -x-: #359 }
+*::color2 { -x-: #335599 }
+*::color3 { -x-: rgba(144, 0, 0, .5) }
+*::color4 { -x-: hsl(0, 100%, 50%) }
+
+/*
+ * #123, #456
+ */
+
+/* #123456 */
+
+td { border: solid red 4px; }
+td { border: solid #f00d 4px; }
+
+:root { --variable-test: rgb(1, 2, 3); }
+button { color: yellow; background: var(--variable-test); }
+
+/* These are all the same color: */
+h1.hex  { color: #7ab899; }
+h1.num  { color: hsl(150, 30%, 60%); }
+h1.num  { color: hsla(870, 30%, 60%, 1); }
+h1.num  { color: hsl(-210, 30%, 60%); }
+h1.deg  { color: hsl(150deg, 30%, 60%); }
+h1.grad { color: hsl(166.7grad, 30%, 60%); }
+h1.turn { color: hsl(0.41667turn, 30%, 60%); }
+h1.tuac { color: hsl(0.41667turn, 30%, 60%, 1); }
+h1.tuas { color: hsl(0.41667turn 30% 60% / 1); }
+
+/* hwb(), hue/whiteness/blackness
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hwb
+ * These are all the same color: */
+a.a { color: hwb(90 10% 10%); }
+a.b { color: hwb(90 10% 10% / 0.5); }
+a.c { color: hwb(90deg 10% 10%); }
+a.d { color: hwb(1.5708rad 10% 10%); }
+a.e { color: hwb(0.25turn 10% 10% / 50%); }
+
+.do_color_me::after { color: rgb(123, 234, 0) }
+q.tan { border-color: tan; }
+q.white { border-color: white; }
+q.abcdef { border-color: #abcdef; }
+
+/* these should NOT be colored */
+.dont_color_me::after { content: "color: rgb(123, 234, 0)" }
+p.tan { color: inherit; width: calc(100px * tan(45deg)); }
+p.white { color: currentColor; white-space: inherit; }
+#abcdef { border-color: unset; }
+a.cs1 { color: rgb(0, 17, 136 / 100%); } /* you can't mix commas and slash */
+a.cs2 { color: rgb(0  17  136,  100%); } /* you can't mix spaces and commas */
+a.cs3 { color: rgb(0  17  136  1); } /* alpha with spaces must use slash */
+a.cs4 { color: rgb(0  17  136  100%); } /* alpha with spaces must use slash */
+a.cs4 { color: rgb(0turn 17 136); } /* angular units aren't allowed in rgb */
+h1.nonpct1 { color: hsl(150%, 30%, 60%); }
+h1.nonpct1 { color: hsl(150, 30, 60%); }
+h1.nonpct2 { color: hsl(150, 30%, 60); }
+h1.nonpct3 { color: hsl(150, 30, 60); }
+a.a { color: hwb(90% 10% 10%); }
+a.a { color: hwb(90 10 10%); }
+a.a { color: hwb(90 10% 10); }
+a.h5 { color: #00118; }
+a.h7 { color: #001188f; }
+a.h9 { color: #001188fff; }
+

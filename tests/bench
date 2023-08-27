@@ -1,6 +1,15 @@
 #!/bin/sh
-set -e
 s=startuptime.txt
-vim --startuptime $s -o -c qa "$@"
-perl -lane'$sum += $F[1] if m!/\.vim/after/syntax/css\.vim$!; END {print $sum}' $s
-rm $s
+this=$(realpath "$0" 2>/dev/null || readlink -f "$0")
+[ $# = 0 ] && cd "${this%/*}" && set -- *.*  # default to all files with a dot
+target="${this%/tests/*}/after/syntax/css.vim"
+[ $# -gt 1 ] && multi=1 || multi=
+for sample in "$@"; do
+  vim --startuptime $s -c qa "$sample"
+  run=$(awk -v t="$target" 'index($0, t) {sum += $2} END {print sum}' "$s")
+  rm $s
+  echo "$run${multi:+\t$sample}"
+  total="${total:-0} + ${run:-0}"
+done
+# if multi, show the sum total. otherwise, return true only if we had a run.
+[ -n "$multi" ] && echo "$(echo "$total" |bc -ql)\t(total)" || [ -n "$run" ]
