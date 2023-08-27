@@ -7,5 +7,8 @@
   <circle cx="150" cy="100" r="80" fill="rgb(0,128,5)" />
 
   <text x="150" y="125" font-size="60" text-anchor="middle" fill="white">SVG</text>
+  <!-- commented code: should this be green?
+    <circle cx="150" cy="100" r="80" fill="rgb(0,128,5)" />
+  -->
 
 </svg>
