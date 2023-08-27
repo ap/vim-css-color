@@ -3,8 +3,6 @@ syn keyword	svgAttrib	contained containedin=xmlTag nextgroup=svgColor fill color
 syn match	svgColor	contained +="[^"]\+"+
 syn match	svgColor	contained +='[^']\+'+
 
-" the first item here is redundant for html (which loads this) but necessary for svg
-hi def link xmlTag	xmlTag
 hi def link svgAttrib	Type
 hi def link svgColor	String
 
