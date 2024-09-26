@@ -11,6 +11,14 @@ git clone https://github.com/ap/vim-css-color.git ~/.vim/pack/css-color/start/cs
 
 </div>
 
+<h2>Conditional Loading</h2>
+
+If you want to only load this plugin on some files, you can use conditional loading feature in [vim plug](https://github.com/junegunn/vim-plug#example)
+
+```
+Plug 'ap/vim-css-color', { 'for': [ 'css', 'scss' ] }
+```
+
 <sub>Inspired
 by  [Niklas Hofer](http://www.vim.org/scripts/script.php?script_id=2150)
 and [Max Vasiliev](https://github.com/skammer/vim-css-color).</sub>
